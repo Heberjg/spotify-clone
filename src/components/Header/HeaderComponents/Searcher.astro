@@ -1,0 +1,86 @@
+---
+import Search  from '../HeaderIcons/Search.astro';
+
+---
+<form action="">
+<button type="button" id="label-Searcher" aria-labelledby="" class="flex place-items-center bg-neutral-800 rounded-full p-0 m-0 border-none hover:bg-neutral-600 transition-all duration-200 ease-in-out cursor-pointer">
+  <span id="Expand-searcher" aria-hidden="false" tabindex="-1" class="p-2.5">
+    <div class="transition-all duration-200 ease-in-out hover:scale-108">
+    <Search/>
+    </div>
+  </span>
+  <input type="text" placeholder="Search" id="searcher" class="bg-transparent rounded-full border-none outline-none overflow-hidden invisible transition-all duration-300"/>
+</button>
+</form>
+
+
+<script>
+	const button = document.querySelector('#searcher');
+  const expandButton = document.querySelector('#Expand-searcher');
+  const downloadText = document.querySelector('#download-text');
+
+let isClicked = false;
+
+expandButton?.addEventListener('click', () => {
+  isClicked = !isClicked;
+  button?.classList.toggle('invisible');
+  button?.classList.toggle('visible');
+    updateVisibility();
+});
+
+function updateVisibility() {
+  const currentWidth = window.innerWidth;
+  
+  // For mobile behavior (width < 520px)
+  if (currentWidth < 520) {
+    // Always hide download text on mobile
+    downloadText?.classList.remove('visible');
+    downloadText?.classList.add('invisible');
+  }
+  else if (currentWidth > 520 && currentWidth < 768) {
+    // For tablet behavior (width >= 520px and < 768px)
+    // Toggle download text visibility based on click
+    if (isClicked === false) {
+      downloadText?.classList.remove('invisible');
+      downloadText?.classList.add('visible');
+    } else {
+      downloadText?.classList.remove('visible');
+      downloadText?.classList.add('invisible');
+    }
+  } 
+  // For desktop behavior (width >= 768px)
+  else if (currentWidth >= 768) {
+    // Always show download text regardless of click state
+    downloadText?.classList.remove('invisible');
+    downloadText?.classList.add('visible');
+  }
+}
+
+// Handle window resize
+window.addEventListener('resize', updateVisibility);
+
+// Initial 
+updateVisibility();
+</script>
+
+<style>
+      #searcher {
+  /* visibility: hidden; */
+  width: 0;
+  margin: 0;
+  opacity: 0;
+  padding: 0;
+  height: 0;
+}
+
+#searcher.visible {
+  /* visibility: visible; */
+  opacity: 1;
+  width: clamp(6em, 34vw, 30em);
+  height: 3em;
+}
+
+#label-Searcher:has(#searcher.visible) {
+    
+}
+</style>

@@ -1,0 +1,89 @@
+---
+import SpotifyLogo from "./HeaderIcons/SpotifyLogo.astro";
+import SpotifyHome from "./HeaderIcons/SpotifyHome.astro";
+import Search from "./HeaderIcons/Search.astro";
+import DownloadLogo from "./HeaderIcons/DownloadLogo.astro";
+import Notification from "./HeaderIcons/Notification.astro";
+import Searcher from "./HeaderComponents/Searcher.astro"; 
+import NavUser from "./HeaderComponents/NavUser.astro";
+// Header.astro}}
+
+---
+
+
+<header >
+  <nav class="home-header flex gap-6 place-items-center w-full" >
+    <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer">
+      <SpotifyLogo  />
+    </a>
+    <div class="home-searcher flex gap-4 place-items-center flex-shrink w-full" >
+      <a href="" class="bg-neutral-800 rounded-full p-2.5 hover:bg-neutral-600 transition duration-200 ease-in-out">
+        <div class="hover:scale-108 transition-all duration-200 ease-in-out">
+        <SpotifyHome />
+        </div>
+      </a>
+      <Searcher />
+    </div>
+    <div class="user flex-1 flex place-items-center justify-end mr-20 transition-all duration-200" >
+      <nav class="user-nav flex place-items-center gap-4" >
+        <a href="" class="container-download flex  place-items-center text-nowrap fill-neutral-400 hover:fill-neutral-200 transition-all duration-150 ease-in-out text-neutral-400 hover:text-neutral-200" >
+          <div class="hover:scale-105 transition-all duration-200 ease-in-out">
+            <DownloadLogo  />
+          </div>
+          <span id="download-text" aria-hidden="true" tabindex="-1" class="transition-all duration-200 ease-in-out text-[0.76em]">instalar aplicacion</span>
+        </a>
+        <a href="" class="fill-neutral-400 hover:fill-neutral-200 hover:scale-110 transition-all duration-150 ease-in-out" >
+          <Notification />
+        </a>
+        <NavUser />
+      </nav>
+    </div>
+  </nav>
+</header>
+
+
+<style>
+  header {
+    grid-area: hd;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    padding: 0.6em 1em;
+    background-color: var(--background-color);
+  }
+  
+  .home-header a {
+    text-decoration: none;
+    /* color: var(--text-color); */
+  }
+
+  .User-list-nav {
+    display: none;
+    list-style: none;
+  }
+
+#download-text {
+  /* visibility: hidden; */
+  width: 0;
+  margin: 0;
+  opacity: 0;
+  padding: 0;
+  interpolate-size: allow-keywords;
+}
+
+.container-download:hover:has(#download-text.visible) {
+  scale: 105%;
+}
+
+  #download-text.visible {
+  /* visibility: visible; */
+  width: auto;
+  opacity: 1;
+  margin-left: 0.4em;
+}
+
+
+</style>
+
