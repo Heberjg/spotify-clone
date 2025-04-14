@@ -1,7 +1,6 @@
 ---
 import SpotifyLogo from "./HeaderIcons/SpotifyLogo.astro";
 import SpotifyHome from "./HeaderIcons/SpotifyHome.astro";
-import Search from "./HeaderIcons/Search.astro";
 import DownloadLogo from "./HeaderIcons/DownloadLogo.astro";
 import Notification from "./HeaderIcons/Notification.astro";
 import Searcher from "./HeaderComponents/Searcher.astro"; 
@@ -12,11 +11,11 @@ import NavUser from "./HeaderComponents/NavUser.astro";
 
 
 <header >
-  <nav class="home-header flex gap-6 place-items-center w-full" >
-    <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer">
+  <nav class="home-header flex gap-5 place-items-center w-full" >
+    <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" class="">
       <SpotifyLogo  />
     </a>
-    <div class="home-searcher flex gap-4 place-items-center flex-shrink w-full" >
+    <div class="home-searcher flex gap-3  flex-2 place-items-center w-fit" >
       <a href="" class="bg-neutral-800 rounded-full p-2.5 hover:bg-neutral-600 transition duration-200 ease-in-out">
         <div class="hover:scale-108 transition-all duration-200 ease-in-out">
         <SpotifyHome />
@@ -24,14 +23,14 @@ import NavUser from "./HeaderComponents/NavUser.astro";
       </a>
       <Searcher />
     </div>
-    <div class="user flex-1 flex place-items-center justify-end mr-20 transition-all duration-200" >
-      <nav class="user-nav flex place-items-center gap-4" >
-        <a href="" class="container-download flex  place-items-center text-nowrap fill-neutral-400 hover:fill-neutral-200 transition-all duration-150 ease-in-out text-neutral-400 hover:text-neutral-200" >
-          <div class="hover:scale-105 transition-all duration-200 ease-in-out">
+    <div class="user flex-1 flex place-items-center justify-start transition-all duration-200 mr-1" >
+      <nav class="user-nav flex place-items-center gap-4 transition-all duration-150" >
+        <div class="flex text-nowrap rounded-full p-0 place-items-center   fill-neutral-400 hover:fill-neutral-100 text-neutral-400 hover:text-neutral-100 hover:scale-105 transition-all duration-200 ease-in-out">
+          <a href="" class="container-download fill-inherit p-0" >
             <DownloadLogo  />
-          </div>
-          <span id="download-text" aria-hidden="true" tabindex="-1" class="transition-all duration-200 ease-in-out text-[0.76em]">instalar aplicacion</span>
-        </a>
+          </a>
+          <span id="download-text" aria-hidden="true" tabindex="-1" class="text-[0.76em] cursor-pointer over">instalar aplicacion</span>
+        </div>
         <a href="" class="fill-neutral-400 hover:fill-neutral-200 hover:scale-110 transition-all duration-150 ease-in-out" >
           <Notification />
         </a>
@@ -71,10 +70,11 @@ import NavUser from "./HeaderComponents/NavUser.astro";
   opacity: 0;
   padding: 0;
   interpolate-size: allow-keywords;
+  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out, margin 0.2s ease-in-out
 }
 
 .container-download:hover:has(#download-text.visible) {
-  scale: 105%;
+  /* scale: 105%; */
 }
 
   #download-text.visible {
@@ -82,6 +82,7 @@ import NavUser from "./HeaderComponents/NavUser.astro";
   width: auto;
   opacity: 1;
   margin-left: 0.4em;
+  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out, margin 0.2s ease-in-out;
 }
 
 

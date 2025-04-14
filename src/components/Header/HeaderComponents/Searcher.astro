@@ -1,21 +1,40 @@
 ---
 import Search  from '../HeaderIcons/Search.astro';
-
+import ExplorerButton from '../HeaderIcons/ExplorerButton.astro';
+import DeleteSearch from '../HeaderIcons/DeleteSearch.astro';
 ---
-<form action="">
-<button type="button" id="label-Searcher" aria-labelledby="" class="flex place-items-center bg-neutral-800 rounded-full p-0 m-0 border-none hover:bg-neutral-600 transition-all duration-200 ease-in-out cursor-pointer">
-  <span id="Expand-searcher" aria-hidden="false" tabindex="-1" class="p-2.5">
-    <div class="transition-all duration-200 ease-in-out hover:scale-108">
-    <Search/>
+<form action="" class="flex place-items-center bg-neutral-800 rounded-full p-0 m-0 border-none hover:bg-neutral-600 transition-all duration-200 ease-in-out cursor-pointer" id="searcher-form" role="search" aria-label="Search">
+  <button type="button" id="label-Searcher" aria-expanded="false" aria-controls="searcher" aria-label="Open-search" class="flex place-items-center p-2.5 m-0 border-none bg-transparent rounded-full cursor-pointer">
+    <span id="Expand-searcher" aria-hidden="false" tabindex="-1" class="transition-all duration-200 ease-in-out hover:scale-108">
+        <Search/>
+    </span>
+  </button>
+
+    <!-- BOTONES DE BUSCADOR -->
+  <div class="flex place-items-center bg-transparent rounded-full border-none outline-none overflow-hidden invisible" id="searcher-container" aria-hidden="false" aria-label="Searcher-container">
+    <label for="searcher">
+      <input type="text" placeholder="¿Qué quieres reproducir?" id="searcher"  class="text-sm bg-transparent rounded-full border-none outline-none overflow-hidden"/>
+    </label>
+
+    <div class="flex ps-2 pe-4 gap-2 place-items-center transition-all duration-200 ease-in-out ">
+      <button type="button" class="Show-Button border-none opacity-0 w-0 bg-transparent rounded-full transition-all duration-200 ease-in-out  p-0  hover:scale-108 cursor-pointer" id="delete-searcher" aria-label="Delete-searcher" aria-controls="searcher" aria-expanded="false" aria-hidden="true" tabindex="-1">
+        <span id="delete-searcher-icon" class="transition-all duration-100 ease-in-out fill-neutral-400 hover:fill-neutral-200">
+          <DeleteSearch/>
+        </span>
+      </button>
+      <span class="text-2xl text-neutral-400 cursor-default">|</span>
+      <button type="button" class="Show-Button border-none bg-transparent rounded-full  transition-all duration-200 ease-in-out w-0 p-0 opacity-0 overflow-hidden hover:scale-108 cursor-pointer" id="explorer-button" aria-label="Explorer-button" aria-controls="searcher" aria-expanded="false" aria-hidden="true" tabindex="-1">
+        <span id="explorer-button-icon" class="transition-all duration-100 ease-in-out fill-neutral-400 hover:fill-neutral-200">
+          <ExplorerButton/>
+        </span>
+      </button>
     </div>
-  </span>
-  <input type="text" placeholder="Search" id="searcher" class="bg-transparent rounded-full border-none outline-none overflow-hidden invisible transition-all duration-300"/>
-</button>
+  </div>
 </form>
 
 
 <script>
-	const button = document.querySelector('#searcher');
+	const button = document.querySelector('#searcher-container');
   const expandButton = document.querySelector('#Expand-searcher');
   const downloadText = document.querySelector('#download-text');
 
@@ -64,23 +83,59 @@ updateVisibility();
 </script>
 
 <style>
-      #searcher {
+
+
+#searcher-form {
+  max-width: 400px;
+  width: auto;
+  /* flex: 1 1 auto; */
+  /* flex-shrink: 1; */
+  /* flex: 1; */
+
+}
+
+#searcher-form:has(#searcher-container.visible) {
+  flex: 1;
+}
+
+  #searcher-container {
   /* visibility: hidden; */
   width: 0;
   margin: 0;
   opacity: 0;
   padding: 0;
-  height: 0;
+  interpolate-size: allow-keywords;
 }
 
-#searcher.visible {
+#searcher-container.visible {
   /* visibility: visible; */
   opacity: 1;
-  width: clamp(6em, 34vw, 30em);
-  height: 3em;
+  width: auto;
+  /* max-width: min(400px, 100vw); */
+  flex: 1;
+  transition: all 0.2s ease-in-out;
+
+  label {
+    /* max-width: min(150vw, 100px); */
+    /* max-width: min(400px, 100vw); */
+    width: 100%;
+    display: flex;
+    flex: 1;
+
+    input {
+      width: 100%;
+      flex: 1;
+    }
+  }
+
+    .Show-Button {
+      width: fit-content;
+      visibility: visible;
+      opacity: 1;
+      overflow: visible;
+    }
 }
 
-#label-Searcher:has(#searcher.visible) {
-    
-}
+
+
 </style>
