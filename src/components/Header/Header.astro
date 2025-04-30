@@ -10,34 +10,32 @@ import NavUser from "./HeaderComponents/NavUser.astro";
 ---
 
 
-<header >
-  <nav class="home-header flex gap-5 place-items-center w-full" >
-    <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" class="">
+<header transition:name="media-header" transition:persist class="z-50" >
+  <div class="home-header flex gap-3 place-items-center w-full" >
+    <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" id="SpotifyLogo" aria-label="Spotify" >
       <SpotifyLogo  />
     </a>
     <div class="home-searcher flex gap-3  flex-2 place-items-center w-fit" >
-      <a href="" class="bg-neutral-800 rounded-full p-2.5 hover:bg-neutral-600 transition duration-200 ease-in-out">
-        <div class="hover:scale-108 transition-all duration-200 ease-in-out">
+      <a href="/#" class="bg-neutral-800 rounded-full p-3 hover:bg-neutral-600 transition duration-200 ease-in-out" aria-label="Inicio" >
+        <span class="hover:scale-108 transition-all duration-200 ease-in-out">
         <SpotifyHome />
-        </div>
+        </span>
       </a>
-      <Searcher />
+      <Searcher transition:name="media-searcher" transition:persist/>
     </div>
-    <div class="user flex-1 flex place-items-center justify-start transition-all duration-200 mr-1" >
-      <nav class="user-nav flex place-items-center gap-4 transition-all duration-150" >
-        <div class="flex text-nowrap rounded-full p-0 place-items-center   fill-neutral-400 hover:fill-neutral-100 text-neutral-400 hover:text-neutral-100 hover:scale-105 transition-all duration-200 ease-in-out">
-          <a href="" class="container-download fill-inherit p-0" >
+    <div class="user flex-1 flex place-items-center justify-end transition-all duration-200 gap-4" >
+      <div class="container-download flex text-nowrap rounded-full p-0 place-items-center   fill-neutral-400 hover:fill-neutral-100 text-neutral-400 hover:text-neutral-100 transition-all duration-200 ease-in-out">
+        <a href="/#" class="fill-inherit p-0" aria-label="Descargar Spotify">
             <DownloadLogo  />
-          </a>
-          <span id="download-text" aria-hidden="true" tabindex="-1" class="text-[0.76em] cursor-pointer over">instalar aplicacion</span>
-        </div>
-        <a href="" class="fill-neutral-400 hover:fill-neutral-200 hover:scale-110 transition-all duration-150 ease-in-out" >
-          <Notification />
         </a>
-        <NavUser />
-      </nav>
+        <span id="download-text" aria-hidden="true" tabindex="-1" class="text-[0.8em] cursor-pointer over overflow-hidden font-bold">instalar aplicacion</span>
+      </div>
+      <a href="/#" class="fill-neutral-400 hover:fill-neutral-200 hover:scale-110 transition-all duration-150 ease-in-out" aria-label="Notifications" >
+          <Notification />
+      </a>
+      <NavUser transition:name="media-navUser" transition:persist />
     </div>
-  </nav>
+  </div>
 </header>
 
 
@@ -49,18 +47,16 @@ import NavUser from "./HeaderComponents/NavUser.astro";
     justify-content: space-between;
     align-items: center;
     align-content: center;
-    padding: 0.6em 1em;
+    
     background-color: var(--background-color);
   }
   
+  #SpotifyLogo {
+    margin-inline: 1.5em 1em;
+  }
   .home-header a {
     text-decoration: none;
     /* color: var(--text-color); */
-  }
-
-  .User-list-nav {
-    display: none;
-    list-style: none;
   }
 
 #download-text {
@@ -70,19 +66,26 @@ import NavUser from "./HeaderComponents/NavUser.astro";
   opacity: 0;
   padding: 0;
   interpolate-size: allow-keywords;
-  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out, margin 0.2s ease-in-out
+  transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out, margin 0.2s ease-in-out;
 }
 
 .container-download:hover:has(#download-text.visible) {
-  /* scale: 105%; */
+  scale: 105%;
 }
 
+.container-download:hover:has(#download-text.invisible) {
+  
+  a {
+    scale: 105%;
+  }
+}
   #download-text.visible {
   /* visibility: visible; */
   width: auto;
   opacity: 1;
   margin-left: 0.4em;
   transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out, margin 0.2s ease-in-out;
+
 }
 
 

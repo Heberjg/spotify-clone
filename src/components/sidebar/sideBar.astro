@@ -1,0 +1,210 @@
+---
+import Search from "./sideBarIconos/Search.astro";
+import BibliotecaIcon from "./sideBarIconos/BibliotecaIcon.astro";
+import ClasificarIcon from "./sideBarIconos/ClasificarIcon.astro";
+import AbrirBibliotecaIcon from "./sideBarIconos/AbrirBibliotecaIcon.astro";
+import CrearIcon from "./sideBarIconos/CrearIcon.astro";
+
+import { songs } from "../../Content/Songs.mjs";
+
+---
+
+
+<aside class="rounded-lg shadow-lg flex flex-col p-1.5 overflow-hidden place-items-center" id="sidebar"  role="navigation" aria-label="Sidebar" transition:name='media-sidebar' transition:persist>
+    <div aria-label="Header-aside" class="flex flex-col p-2.5 place-content-center place-items-center" id="Container-Header-aside">
+      <div class="NotExpanded gap-2 transition-all duration-200" id="Header-aside">
+        <button class="bg-transparent border-none cursor-pointer h-fit flex p-2.5 place-items-center fill-neutral-400 hover:fill-neutral-200 text-neutral-400 hover:text-neutral-200 transition-all duration-150 ease-in-out" id="abrir-biblioteca" aria-label="Abrir biblioteca" aria-expanded="false" role="button" tabindex="0" >
+          <span class="flex place-content-center">
+          <BibliotecaIcon  />
+          </span>
+          <span class="hidden">Biblioteca</span>
+        </button>
+        <button class="bg-neutral-900 hover:bg-neutral-700 rounded-full border-none h-fit cursor-pointer flex place-items-center p-2.5 fill-neutral-400 hover:fill-neutral-200 transition-all duration-150 ease-in-out">
+            <span class="flex place-content-center ">
+            <CrearIcon  />
+            </span>
+        </button>
+      </div>
+      <div class="InvisibleItem flex gap-2 " id="Container-Etiquetas">
+        <button class="Etiquetas-item">
+          <span class="flex place-content-center">Playlists</span>
+        </button>
+        <button class="Etiquetas-item">
+          <span class="flex place-content-center">Artistas</span>
+        </button>
+        <button class="Etiquetas-item">
+          <span class="flex place-content-center">Álbumes</span>
+        </button>
+      </div>
+    </div>
+    <div id="Container-Song-Searcher" class="flex flex-col overflow-hidden w-full gap-2" aria-expanded="false">
+      <div id="Song-searcher" class="flex justify-between px-2 py-1 InvisibleItem" aria-hidden="true" tabindex="-1">
+        <button class="bg-transparent border-none cursor-pointer w-fit flex p-2 place-items-center fill-neutral-400 hover:fill-neutral-200 text-neutral-400 hover:text-neutral-200 transition-all duration-150 ease-in-out">
+          <span class="flex place-content-center">
+          <Search  />
+          </span>
+        </button>
+        <button class="bg-transparent border-none cursor-pointer w-fit flex p-2 place-items-center fill-neutral-400 hover:fill-neutral-200 text-neutral-400 hover:text-neutral-200 transition-all duration-150 ease-in-out gap-2">
+          <span class="">Recientes</span>
+          <span class="flex place-content-center">
+          <ClasificarIcon  />
+          </span>
+      </div>
+      <div id="Container-song" >
+        {
+          songs.map(song =>{
+              const { id, Name, Image, Artist, type } = song
+
+              return (
+              <div class="song-item" >
+                <button data-id={id} class="Song-button-aside"> 
+                  <img src={Image} alt={Name} class="song-image" />
+                  <span class="play-icon"></span>
+                  <div class="song-details invisible transition-all duration-200 ease-in-out">
+                    <h3 aria-label={Name}>{Name}</h3>
+                    <p>{Artist}</p>
+                  </div>
+                </button>
+              </div>
+              )
+          })
+        }
+      </div>
+    </div>
+      <!-- Songs will be dynamically inserted here -->
+</aside>
+
+<script>
+  import { SideBarSong } from "../sidebar/SideBarComponents/SidebarSong.mjs"
+  SideBarSong();
+  console.log('Sidebar persistente inicializado');
+</script>
+
+<style is:inline>
+  aside {
+    grid-area: sb;
+    background-color: var(--background-color-grid);
+  }
+
+  #Container-Header-aside:has(#Header-aside.Expanded) {
+    gap: 1em;
+  }
+
+  .Expanded {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    place-items: center;
+  }
+  .NotExpanded {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+  }
+
+  .InvisibleItem {
+    width: 0;
+    height: 0;
+    opacity: 0;
+    /* transition: all 0.2s ease; */
+    margin: 0;
+    padding: 0;
+    visibility: hidden;
+    interpolate-size: allow-keywords;
+  }
+
+  .VisibleItem {
+    width: auto;
+    height: auto;
+    opacity: 1;
+    transition: all 0.1s ease-in-out;
+    visibility: visible;
+    interpolate-size: allow-keywords;
+  }
+
+  .Etiquetas-item {
+    background: #313131aa;
+    border: none;
+    padding: 0.6em;
+    border-radius: 15px;
+    color: var(--text-color);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .Etiquetas-item:hover {
+  background: #313131;
+  }
+
+  .song-item {
+    display: flex;
+    align-items: center;
+    transition: all 0.15s ease;
+    border-radius: 8px;
+
+    button {
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 0.5em;
+      width: 100%;
+    }
+    
+    img {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      
+    }
+
+    &:hover {
+      background-color: #222;
+    }
+
+    .song-details {
+      display: flex;
+      flex-direction: column;
+      text-align: start;
+      overflow: hidden;
+      text-wrap: nowrap;
+      width: 0;
+      opacity: 0;
+      interpolate-size: allow-keywords;
+      
+      h3 {
+        font-size: 1rem;
+        color: var(--text-color);
+        margin: 0;
+        font-weight: 600;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: var(--icon-color);
+        margin: 0;
+      }
+    }
+  }
+
+  .song-details.visible {
+    margin-left: 0.6em;
+    width: auto;
+    height: auto;
+    opacity: 1;
+    gap: 5px;
+    interpolate-size: allow-keywords;
+  }
+
+  .play-icon {
+    width: 0;
+      height: 0;
+      opacity: 0;
+      transition: all 0.2s ease;
+      margin: 0;
+      padding: 0;
+  }
+</style>
+
+

@@ -1,13 +1,164 @@
 ---
 ---
 
-<span class="place-items-center flex  bg-neutral-600 rounded-full p-1 hover:bg-neutral-500 transition-all duration-200 ease-in-out cursor-pointer">
-  <img src="https://i.pinimg.com/736x/fa/d5/e7/fad5e79954583ad50ccb3f16ee64f66d.jpg" alt="" class="h-6 w-6 rounded-full place-items-center" />
-  <ul class="hidden">
-    <li class="User-list-nav"><a href="">Cuenta</a></li>
-    <li class="User-list-nav"><a href="">Perfil</a></li>
-    <li class="User-list-nav"><a href="">Cambiate a Premiun</a></li>
-    <li class="User-list-nav"><a href="">Ayuda</a></li>
-    <li class="User-list-nav"><a href="">Preferencias</a></li>
-  </ul>
-<span/>
+<button type="button" class="place-items-center flex bg-neutral-800 rounded-full p-2 border-none m-0 hover:bg-neutral-700 transition-all duration-200 ease-in-out cursor-pointer relative" id="Container-user" aria-expanded="false" aria-label="Menú de Usuario" aria-controls="Container-user-nav" aria-haspopup="true" tabindex="0" >
+  <figure class="m-0 flex place-items-center">
+    <img   src="https://i.pinimg.com/736x/fa/d5/e7/fad5e79954583ad50ccb3f16ee64f66d.jpg" alt="" id="Image-User" class=" rounded-full place-items-center" />
+  </figure>
+  <nav class="flex absolute bg-neutral-800 rounded-lg p-1 top-14 right-0  text-neutral-300 text-[1em] font-medium shadow-lg transition-all duration-200 ease-in-out text-nowrap invisible overflow-hidden" id="Container-user-nav" aria-hidden="true"  aria-labelledby="Container-user">
+    <ul class="User-list-nav flex flex-col gap-2 p-0 m-0 list-style-none w-45" >
+      <li class="User-list-item">
+        <a href="/#" aria-label="Cuenta">Cuenta</a>
+      </li>
+      <li class="User-list-item">
+        <a href="/#" aria-label="Perfil">Perfil</a>
+      </li>
+      <li class="User-list-item">
+        <a href="/#" aria-label="Cambiate a Premiun">Cambiate a Premiun</a>
+      </li>
+      <li class="User-list-item">
+        <a href="/#" aria-label="Ayuda">Ayuda</a>
+      </li>
+      <li class="User-list-item">
+        <a href="/#" aria-label="Preferencias">Preferencias</a>
+      </li>
+      <li class="User-list-item">
+        <a href="/#" aria-label="Cerrar Cuenta">Cerrar Cuenta</a>
+      </li>
+    </ul>
+  </nav>
+</button>
+
+<script>
+const userButton = document.getElementById('Container-user');
+const userMenu = document.getElementById('Container-user-nav');
+
+userButton?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  // Toggle the menu visibility and aria attributes
+  const isExpanded = userButton.getAttribute('aria-expanded') === 'true';
+  closeMenu();
+  if (!isExpanded) {
+      setTimeout(() => {
+          const firstItem = userMenu?.querySelector('a');
+          firstItem?.focus();
+      }, 50);
+  }
+});
+
+document.addEventListener('click', function(e) {
+  const target = e.target as HTMLElement;
+  
+  // Verificar si el menú está abierto
+  const isMenuOpen = userButton?.getAttribute('aria-expanded') === 'true';
+  
+  // Verificar si el clic fue fuera del menú y del botón
+  const isClickOutside = !userMenu?.contains(target) && target !== userButton;
+  
+  if (isMenuOpen && isClickOutside) {
+    closeMenu();
+  }
+});
+
+// Cerrar menú con tecla Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && userButton?.getAttribute('aria-expanded') === 'true') {
+    closeMenu();
+  } 
+});
+
+
+// Cerrar menú con Tab y Shift+Tab
+document.addEventListener('keydown', function(e) {
+    // Solo procesar eventos Tab
+    if (e.key !== 'Tab') return;
+    
+    // Verificar si el menú está abierto
+    if (userButton?.getAttribute('aria-expanded') !== 'true') return;
+    
+    // Obtener todos los elementos enfocables dentro del menú
+    const focusableElements = userMenu?.querySelectorAll('a, button, [tabindex]:not([tabindex="-1"])');
+    if (!focusableElements || focusableElements.length === 0) return;
+    
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    
+    // Manejar Tab (avanzar)
+    if (!e.shiftKey && document.activeElement === lastElement) {
+      e.preventDefault(); // Evitar el comportamiento predeterminado de Tab
+        closeMenu();
+        userButton?.focus();
+    }
+    // Manejar Shift+Tab (retroceder)
+    else if (e.shiftKey && document.activeElement === firstElement) {
+      e.preventDefault();
+      closeMenu();
+      userButton?.focus();
+    }
+});
+
+function closeMenu() {
+  if (userButton?.getAttribute('aria-expanded') === 'true') {
+    userButton?.setAttribute('aria-expanded', 'false');
+    userMenu?.setAttribute('aria-hidden', 'true');
+    userMenu?.setAttribute('tabindex', '-1');
+    userMenu?.classList.add('invisible');
+    userMenu?.classList.remove('visible');
+  } else {
+    userButton?.setAttribute('aria-expanded', 'true');
+    userMenu?.setAttribute('aria-hidden', 'false');
+    userMenu?.setAttribute('tabindex', '0');
+    userMenu?.classList.remove('invisible');
+    userMenu?.classList.add('visible');
+  }
+}
+
+
+</script>
+<style>
+
+  
+  .User-list-item {
+    list-style: none;
+    text-align: start;
+  }
+
+  .User-list-nav a {
+    text-decoration: none;
+    color: inherit;
+    padding: 0.6em 1em;
+    display: block;
+    border-radius: 5px;
+  }
+
+  .User-list-nav a:hover {
+    background-color: rgba(100, 100, 100, 0.3);
+  }
+
+  .User-list-item:nth-child(2):hover, .User-list-item:nth-child(3):hover, .User-list-item:nth-child(4):hover, .User-list-item:nth-child(5):hover   {
+    text-decoration: underline;
+  }
+
+  .User-list-item:hover {
+    color: var(--text-color);
+  }
+
+  #Container-user-nav.invisible {
+    /* invisible: hidden; */
+    opacity: 0;
+    interpolate-size: allow-keywords;
+    transform: translate(20px, -40px) scale(0.8);
+    ;
+  }
+
+
+  #Image-User {
+    width: 32px;
+    height: auto;
+  }
+  #Container-user-nav.visible {
+    /* visible: visible; */
+    opacity: 1;
+    transition: all 0.2s ease-in-out;
+  }
+</style>

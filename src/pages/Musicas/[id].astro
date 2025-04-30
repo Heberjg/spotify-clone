@@ -1,0 +1,41 @@
+---
+import { songs } from "../../Content/Songs.mjs";
+import Layout from "../../layouts/Layout.astro";
+import Reproducir from "../../components/Footer/FooterIcons/Reproducir.astro";
+export async function getStaticPaths() {
+  
+  return songs.map((song) => ({
+    params: {id: song.id},
+    props: { song },
+  }))
+}
+const { song } = Astro.props
+const { id } = Astro.params;
+// const Playlist = songs.find((song) => song.id === id)
+
+// Si no existe, redirigir a 404
+if (!song) {
+  return Astro.redirect('/404');
+}
+
+const {Name, Artist, Image, type } = song;
+---
+
+
+<Layout>
+  <div class="Card-song flex flex-col gap-3 p-3 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" tabindex="0" role="button" transition:name=`Playlist ${id} box`>
+    <div class="flex relative">
+        <img src={Image} alt={Name} class="rounded-lg w-50" />
+        <button class="Play-button-card absolute border-none rounded-full p-0 m-0 cursor-pointer bg-green-500 hover:bg-green-400 transition-all duration-300 ease-in-out" aria-label="Reproducir" >
+        <span class="fill-neutral-900 flex">
+            <Reproducir />
+        </span>
+        </button>
+    </div>
+    <div class="Card-song-details flex flex-col">
+        <span class="text-[color:var(--icon-color)] text-sm">{Name}</span>
+        <a href="../">Volver atras</a>
+        <span>{Artist}</span>
+    </div>
+  </div>
+</Layout>

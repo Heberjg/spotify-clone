@@ -3,20 +3,21 @@ import Search  from '../HeaderIcons/Search.astro';
 import ExplorerButton from '../HeaderIcons/ExplorerButton.astro';
 import DeleteSearch from '../HeaderIcons/DeleteSearch.astro';
 ---
-<form action="" class="flex place-items-center bg-neutral-800 rounded-full p-0 m-0 border-none hover:bg-neutral-600 transition-all duration-200 ease-in-out cursor-pointer" id="searcher-form" role="search" aria-label="Search">
-  <button type="button" id="label-Searcher" aria-expanded="false" aria-controls="searcher" aria-label="Open-search" class="flex place-items-center p-2.5 m-0 border-none bg-transparent rounded-full cursor-pointer">
-    <span id="Expand-searcher" aria-hidden="false" tabindex="-1" class="transition-all duration-200 ease-in-out hover:scale-108">
+<form action="" class="flex place-items-center bg-neutral-800 rounded-full  m-0 p-0 transition-all duration-200 ease-in-out cursor-pointer" id="searcher-form" role="search" aria-label="Search">
+  <button type="button" aria-expanded="false" aria-controls="searcher" aria-label="Open-search" class="flex place-items-center p-0 m-0 border-none bg-transparent rounded-full cursor-pointer fill-neutral-400 hover:fill-neutral-200 transition-all duration-200" id="Expand-searcher" >
+    <span aria-hidden="false" tabindex="-1" class="flex place-items-center p-3">
         <Search/>
     </span>
   </button>
 
     <!-- BOTONES DE BUSCADOR -->
   <div class="flex place-items-center bg-transparent rounded-full border-none outline-none overflow-hidden invisible" id="searcher-container" aria-hidden="false" aria-label="Searcher-container">
-    <label for="searcher">
-      <input type="text" placeholder="¿Qué quieres reproducir?" id="searcher"  class="text-sm bg-transparent rounded-full border-none outline-none overflow-hidden"/>
+    <label for="searcher" aria-label="Searcher">
+      <span class="sr-only">Buscar canciones</span>
+      <input type="text"  placeholder="¿Qué quieres reproducir?" id="searcher"  class="text-sm bg-transparent rounded-full border-none outline-none overflow-hidden " aria-label="Buscar canciones"/>
     </label>
 
-    <div class="flex ps-2 pe-4 gap-2 place-items-center transition-all duration-200 ease-in-out ">
+    <div class="flex pe-4 ps-2 gap-2 place-items-center transition-all duration-200 ease-in-out ">
       <button type="button" class="Show-Button border-none opacity-0 w-0 bg-transparent rounded-full transition-all duration-200 ease-in-out  p-0  hover:scale-108 cursor-pointer" id="delete-searcher" aria-label="Delete-searcher" aria-controls="searcher" aria-expanded="false" aria-hidden="true" tabindex="-1">
         <span id="delete-searcher-icon" class="transition-all duration-100 ease-in-out fill-neutral-400 hover:fill-neutral-200">
           <DeleteSearch/>
@@ -34,6 +35,7 @@ import DeleteSearch from '../HeaderIcons/DeleteSearch.astro';
 
 
 <script>
+
 	const button = document.querySelector('#searcher-container');
   const expandButton = document.querySelector('#Expand-searcher');
   const downloadText = document.querySelector('#download-text');
@@ -80,22 +82,31 @@ window.addEventListener('resize', updateVisibility);
 
 // Initial 
 updateVisibility();
+
 </script>
 
 <style>
 
-
 #searcher-form {
-  max-width: 400px;
+  max-width: 450px;
   width: auto;
   /* flex: 1 1 auto; */
   /* flex-shrink: 1; */
   /* flex: 1; */
+  
+}
 
+#searcher-form:hover {
+  background-color: rgba(105, 105, 105, 0.5);
+  box-shadow: 0 0 0 0.05em rgba(255, 255, 255, 0.5);
 }
 
 #searcher-form:has(#searcher-container.visible) {
   flex: 1;
+}
+
+#searcher-form:has(#searcher:focus-visible) {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
 }
 
   #searcher-container {
@@ -118,15 +129,20 @@ updateVisibility();
   label {
     /* max-width: min(150vw, 100px); */
     /* max-width: min(400px, 100vw); */
-    width: 100%;
-    display: flex;
+
+    /* width: 100%; */
     flex: 1;
 
     input {
       width: 100%;
-      flex: 1;
+      font-size: 1em;
+      padding-block: 0.7em;
+      color: #ddd;
+      padding-inline: 0;
     }
+
   }
+    
 
     .Show-Button {
       width: fit-content;

@@ -1,11 +1,306 @@
 ---
-import Welcome from '../components/Welcome.astro';
+// import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import { songs } from '../Content/Songs.mjs';
+import Reproducir from '../components/Footer/FooterIcons/Reproducir.astro';
+
+const shuffledSongs = [...songs];
+shuffledSongs.sort(() => Math.random() - 0.5);
+const randomSongs = shuffledSongs.slice(0, 4);
+
 ---
 
 <Layout>
-	<Welcome />
+    <div class="flex flex-col w-full max-w-[1820px]">
+        <div class="Container flex  flex-col px-10 py-5 gap-6">
+            <div id="Container-Main-Header-Song" class="flex flex-col break-words pb-5">
+                <h1 class="m-0 text-2xl pb-3">Your music</h1>
+                <div id="Song-List-Main-Header" class="">
+                {
+                    randomSongs.map(song =>{
+                        const { id, Name, Image, Artist } = song
+                        return (
+                            <div class="relative">
+                                <img src={Image} alt={Name} class="rounded-lg"/>
+                                <a href={`/Musicas/${id}`} class="flex place-items-center h-full w-full">
+                                    <span class="card-detail text-neutral-100 text-sm">{Name}</span>
+                                </a>
+                                <button data-id={id} class="Play-button-card absolute border-none rounded-full p-0 m-0 cursor-pointer bg-green-500 hover:bg-green-400 transition-all duration-200 ease-in-out" aria-label="Reproducir">
+                                        <span class="fill-neutral-900 flex">
+                                            <Reproducir />
+                                        </span>
+                                </button>
+                            </div>
+                        )
+                    })
+                }
+                </div>
+            </div>
+            <section id="Container-Main-Song" class="flex flex-col gap-6">
+                <div id="Container-Main-Song-List" class="flex flex-col gap-2">
+                    <div id="Container-Song-List-Title" class="flex justify-between items-baseline-last gap-4">
+                        <div id="Song-List-Title" class="flex flex-col gap-2">
+                            <span class="text-[color:var(--icon-color)] text-sm">Hecho para</span>
+                            <h1 class="m-0 text-2xl">La persona que vea esto</h1>
+                        </div>
+                        <div id="Show-All-Songs" class="flex text-center">
+                            <a href="/#" class="">Mostrar Todo</a>
+                        </div>
+                    </div>
+                    <div id="Main-Song-List" class="flex relative right-8 px-5">
+                    {
+                        songs.map(song =>{
+                            const { id, Name, Image, Artist } = song
+                            return (
+                                <div class="Card-song flex flex-col gap-3 p-3 rounded-lg transition-all duration-300 ease-in-out cursor-pointer z-0" tabindex="0" role="button" >
+                                    <div class="flex relative" transition:name=`Playlist ${id} box` >
+                                        <img src={Image} alt={Name} class="rounded-lg z-0" transition:name=`Playlist ${id} Image` />
+                                        <button data-id={id} class="Play-button-card absolute border-none rounded-full p-0 m-0 cursor-pointer bg-green-500 hover:bg-green-400 transition-all duration-300 ease-in-out z-10" aria-label="Reproducir" tabindex="0" >
+                                            <span class="fill-neutral-900 flex">
+                                                <Reproducir />
+                                            </span>
+                                        </button>
+                                    </div>
+                                    <div class="Card-song-details flex flex-col">
+                                        <a href={`/Musicas/${id}`} tabindex="-1" class="PlayLink">{Name}</a>
+                                        <span>{Artist}</span>
+                                    </div>
+                                </div>
+                            )
+                        })
+                    }
+                    </div>
+                </div> 
+            </section>
+        </div>
+    </div>
 </Layout>
+
+<script>
+    import { LinkClick  } from "../components/LinkClick.mjs";
+    LinkClick();
+    document.addEventListener('DOMContentLoaded', LinkClick);
+    document.addEventListener('astro:after-swap', LinkClick);
+</script>
+
+<style>
+
+    #Main-Song-List {
+        box-shadow: 
+        -10px 0 15px -5px rgba(1, 1, 1, 0.5), 
+        /* 20px 0 10px 5px rgba(1, 1, 1, 0.5);   */
+    }
+
+    #Song-List-Main-Header {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 550px)); 
+    gap: 6px; 
+
+    div {
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        background: rgba(100, 100, 100, 0.5);
+        backdrop-filter: blur(2px);
+        transition: all 0.2s ease-in-out;
+        /* gap: 0.8em; */
+
+        &:hover {
+            background: rgba(100, 100, 100, 0.7);
+
+            button {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        &:focus-within {
+            
+            button {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+
+        a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        img {
+            border-radius: 8px 0 0 8px;
+            width: clamp(48px, 6vw, 80px);
+        }
+
+        .card-detail {
+            font-size: clamp(0.85em, 6vw, 1em);
+            font-weight: 700;
+            margin: 0 0.8em; 
+            padding: 0;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-all;
+        }
+
+        button {
+            position: absolute;
+            top: 50%;  
+            right: 12px;
+            transform: translateY(-50%) scale(1); 
+            visibility: hidden;
+            opacity: 0;
+            transform-origin: center;
+            box-shadow: 0 14px 30px 1px rgba(1, 1, 1, 0.5);
+
+            &:hover {
+                /* scale: 1.05; */
+            }
+            
+
+            span {
+                padding: clamp(0.6em, 1vw, 1.2em);
+
+            }
+        }
+    }
+
+    @media (min-width: 600px) {
+        grid-template-columns: repeat(2, 1fr); 
+    }
+
+
+    @media (min-width: 1224px) {
+        grid-template-columns: repeat(4, 1fr); 
+}
+}
+
+    #Show-All-Songs {
+        
+        a {
+            color: var(--icon-color);
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 700;
+            /* padding: 0.5em 0em; */
+            transition: all 0.3s ease-in-out;
+            font-weight: 900;
+
+            &:hover {
+                cursor: pointer;
+                text-decoration: underline;
+            }
+        }
+    }
+
+    #Song-List-Title {
+        
+        h1 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-break: break-word;
+        }
+
+        span {
+            font-weight: 800;
+        }
+    }
+
+    #Main-Song-List {
+        
+
+        .Card-song {
+
+            &:hover {
+
+            background: #32323266;
+            
+            button {
+
+                    bottom: -5%;
+                    visibility: visible;
+                    opacity: 1;
+                }
+            }
+
+            &:focus-within {
+
+                button {
+                    visibility: visible;
+                    opacity: 1;
+                    bottom: -5%;
+                }
+            }
+            
+
+
+            button {
+            position: absolute;
+            bottom: -20%;  
+            right: -10px;
+            transform: translate(-50%, -50%); 
+            visibility: hidden;
+            opacity: 0;
+            transform-origin: center;
+            box-shadow: 0 14px 30px 1px rgba(1, 1, 1, 0.5);
+
+                &:hover {
+                    /* scale: 1.05; */
+                }
+                
+
+                span {
+                    padding: clamp(0.8em, 2vw, 1.2em);
+
+                }
+            }
+            
+        }
+        
+        img {
+            height: clamp(130px, 18vw, 180px);
+        }
+
+        .Card-song-details {
+            width: 100%;
+            
+
+                a {
+                text-decoration: none;
+                color: #eee;
+                font-weight: 700;
+                margin: 0; 
+                padding: 0; 
+                display: -webkit-box;
+                -webkit-line-clamp: 2; 
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: break-all;
+            }
+
+            span {
+                color: var(--icon-color);
+                font-weight: 500;
+                margin: 0; 
+                padding: 0;
+                display: -webkit-box;
+                -webkit-line-clamp: 2; 
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                word-break: break-all;
+            }
+        }
+    }
+</style>
+
+

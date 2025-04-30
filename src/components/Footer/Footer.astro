@@ -1,0 +1,99 @@
+---
+import Regresar from "./FooterIcons/Regresar.astro"
+import Aleatorio from "./FooterIcons/Aleatorio.astro"
+import Reproducir from "./FooterIcons/Reproducir.astro"
+import Siguiente from "./FooterIcons/Siguiente.astro"
+import Volumen from "./FooterIcons/Volumen.astro"
+import Repetir from "./FooterIcons/Repetir.astro"
+---
+
+<footer class="flex justify-between h-18 place-items-center"  transition:name='media-player' transition:persist>
+  <div id="Container-Listening-Song" class="flex">
+  </div>
+  <div id="Container-Controls-Audio" class="flex flex-col gap-3 place-items-center">
+    <div id="Controls-Audio" class="flex gap-2 place-items-center">
+      <button id="Audio-Random" class="Audio-Button" aria-label="Audio Random">
+        <span class="Audio-Button-Icon">
+          <Aleatorio  />
+        </span>
+      </button>
+      <button id="Audio-Previous" class="Audio-Button" aria-label="Previous song" tabindex="0">
+        <span class="Audio-Button-Icon">
+          <Regresar  />
+        </span>
+      </button>
+      <button id="Audio-Play" class="bg-neutral-50 border-none rounded-full p-0 mx-2 cursor-pointer hover:bg-neutral-400 transition-all duration-200 ease-in-out" aria-label="Reproducir" tabindex="0">
+        <span class="fill-neutral-900 flex p-2.5">
+          <Reproducir />
+        </span>
+      </button>
+      <button id="Audio-Next" class="Audio-Button" aria-label="Skip Song" tabindex="0">
+        <span class="Audio-Button-Icon">
+          <Siguiente  />
+        </span>
+      </button>
+      <button id="Audio-Loop" class="Audio-Button" aria-label="Repeat Loop" tabindex="0">
+        <span class="Audio-Button-Icon">
+          <Repetir  />
+        </span>
+      </button>
+    </div>
+    <div id="Audio-Bar-Duration" class="flex">
+      <span id="Current-Song-Duration" class="text-sm">10</span>
+      <div id="Bar-Song-Duration"></div>
+      <span id="Song-Duration" class="text-sm">10</span>
+    </div>
+    <audio src="" id="Audio"></audio>
+  </div>
+  <div id="Container-Features-Audio">
+    <button id="Audio-Volumen" class="Audio-Button">
+      <span class="Audio-Button-Icon">
+        <Volumen />
+      </span>
+    </button>
+  </div>
+  
+</footer>
+
+<script>
+  import { Player } from "../Footer/FooterComponents/Player.mjs"
+  Player();
+  console.log('Player persistente inicializado');
+</script>
+
+<style>
+  footer {
+    grid-area: ft;
+    background-color: #10101044;
+  }
+  .Audio-Button {
+    padding: 0.6em;
+    margin: 0;
+    background-color: transparent;
+    border: none;
+    display: flex;
+    fill: var(--icon-color);
+    cursor: pointer;
+  }
+
+  #Audio-Play {
+    box-shadow: 0 0 0 0 #999;
+  }
+
+  #Audio-Play:hover {
+    box-shadow: 0 0 0 2px #fff;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .Audio-Button:hover {
+    fill: var(--text-color);
+    scale: 1.1;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .Audio-Button-Icon {
+    
+    display: flex;
+  }
+</style>
+

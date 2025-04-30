@@ -1,5 +1,11 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
+  "compilerOptions": {
+    "module": "Node16",         
+    "moduleResolution": "node16",
+    "types": ["astro/client"], // Asegúrate de incluir esto
+  },
+  "include": [".astro/types.d.ts", "**/*",
+  "env.d.ts"],
   "exclude": ["dist"]
 }
