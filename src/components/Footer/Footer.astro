@@ -7,7 +7,7 @@ import Volumen from "./FooterIcons/Volumen.astro"
 import Repetir from "./FooterIcons/Repetir.astro"
 ---
 
-<footer class="flex justify-between h-18 place-items-center"  transition:name='media-player' transition:persist>
+<footer class="flex justify-between h-18 place-items-center"   transition:persist="Footer-state">
   <div id="Container-Listening-Song" class="flex">
   </div>
   <div id="Container-Controls-Audio" class="flex flex-col gap-3 place-items-center">
@@ -43,7 +43,7 @@ import Repetir from "./FooterIcons/Repetir.astro"
       <div id="Bar-Song-Duration"></div>
       <span id="Song-Duration" class="text-sm">10</span>
     </div>
-    <audio src="" id="Audio"></audio>
+    <audio src="" id="Audio" ></audio>
   </div>
   <div id="Container-Features-Audio">
     <button id="Audio-Volumen" class="Audio-Button">
@@ -57,8 +57,9 @@ import Repetir from "./FooterIcons/Repetir.astro"
 
 <script>
   import { Player } from "../Footer/FooterComponents/Player.mjs"
-  Player();
-  console.log('Player persistente inicializado');
+  Player()
+//   document.addEventListener('DOMContentLoaded', Player);
+// document.addEventListener('astro:after-swap', Player);
 </script>
 
 <style>

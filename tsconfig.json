@@ -3,7 +3,15 @@
   "compilerOptions": {
     "module": "Node16",         
     "moduleResolution": "node16",
-    "types": ["astro/client"], // Asegúrate de incluir esto
+    "types": ["astro/client"], 
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": false,
+    "strictBindCallApply": false,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false
   },
   "include": [".astro/types.d.ts", "**/*",
   "env.d.ts"],

@@ -10,7 +10,7 @@ import NavUser from "./HeaderComponents/NavUser.astro";
 ---
 
 
-<header transition:name="media-header" transition:persist class="z-50" >
+<header transition:persist="Header-state" class="z-50" >
   <div class="home-header flex gap-3 place-items-center w-full" >
     <a href="https://www.spotify.com" target="_blank" rel="noopener noreferrer" id="SpotifyLogo" aria-label="Spotify" >
       <SpotifyLogo  />
@@ -21,7 +21,7 @@ import NavUser from "./HeaderComponents/NavUser.astro";
         <SpotifyHome />
         </span>
       </a>
-      <Searcher transition:name="media-searcher" transition:persist/>
+      <Searcher />
     </div>
     <div class="user flex-1 flex place-items-center justify-end transition-all duration-200 gap-4" >
       <div class="container-download flex text-nowrap rounded-full p-0 place-items-center   fill-neutral-400 hover:fill-neutral-100 text-neutral-400 hover:text-neutral-100 transition-all duration-200 ease-in-out">
@@ -33,7 +33,7 @@ import NavUser from "./HeaderComponents/NavUser.astro";
       <a href="/#" class="fill-neutral-400 hover:fill-neutral-200 hover:scale-110 transition-all duration-150 ease-in-out" aria-label="Notifications" >
           <Notification />
       </a>
-      <NavUser transition:name="media-navUser" transition:persist />
+      <NavUser />
     </div>
   </div>
 </header>

@@ -6,11 +6,12 @@ import AbrirBibliotecaIcon from "./sideBarIconos/AbrirBibliotecaIcon.astro";
 import CrearIcon from "./sideBarIconos/CrearIcon.astro";
 
 import { songs } from "../../Content/Songs.mjs";
+import Reproducir from "../Footer/FooterIcons/Reproducir.astro";
 
 ---
 
 
-<aside class="rounded-lg shadow-lg flex flex-col p-1.5 overflow-hidden place-items-center" id="sidebar"  role="navigation" aria-label="Sidebar" transition:name='media-sidebar' transition:persist>
+<aside class="rounded-lg shadow-lg flex flex-col p-1.5 overflow-hidden place-items-center" id="sidebar"  role="navigation" aria-label="Sidebar"  transition:persist="sidebar-state">
     <div aria-label="Header-aside" class="flex flex-col p-2.5 place-content-center place-items-center" id="Container-Header-aside">
       <div class="NotExpanded gap-2 transition-all duration-200" id="Header-aside">
         <button class="bg-transparent border-none cursor-pointer h-fit flex p-2.5 place-items-center fill-neutral-400 hover:fill-neutral-200 text-neutral-400 hover:text-neutral-200 transition-all duration-150 ease-in-out" id="abrir-biblioteca" aria-label="Abrir biblioteca" aria-expanded="false" role="button" tabindex="0" >
@@ -57,14 +58,16 @@ import { songs } from "../../Content/Songs.mjs";
 
               return (
               <div class="song-item" >
-                <button data-id={id} class="Song-button-aside"> 
+                <button data-id={id} class="Song-button-aside relative"> 
                   <img src={Image} alt={Name} class="song-image" />
-                  <span class="play-icon"></span>
-                  <div class="song-details invisible transition-all duration-200 ease-in-out">
+                  <span class="absolute fill-neutral-50 -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2 opacity-0 hover:scale-105 transition-all duration-200 ease-in-out" aria-label="Reproducir">
+                    <Reproducir />
+                  </span>
+                </button>
+                  <a class="song-details invisible transition-all duration-200 ease-in-out" href={`/Musicas/${id}`} >
                     <h3 aria-label={Name}>{Name}</h3>
                     <p>{Artist}</p>
-                  </div>
-                </button>
+                  </a>
               </div>
               )
           })
@@ -142,23 +145,32 @@ import { songs } from "../../Content/Songs.mjs";
     transition: all 0.15s ease;
     border-radius: 8px;
 
-    button {
+    .Song-button-aside {
       background-color: transparent;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       padding: 0.5em;
-      width: 100%;
+      border-radius: 8px;
+
+      &:hover {
+        img {
+        filter: brightness(0.7);
+      }
+        span {
+          opacity: 1;
+        }
+      }
+
+
+        img {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+      }
     }
     
-    img {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      
-    }
-
     &:hover {
       background-color: #222;
     }
@@ -172,12 +184,15 @@ import { songs } from "../../Content/Songs.mjs";
       width: 0;
       opacity: 0;
       interpolate-size: allow-keywords;
+      cursor: pointer;
+      text-decoration: none;
       
       h3 {
         font-size: 1rem;
         color: var(--text-color);
         margin: 0;
         font-weight: 600;
+        min-width: 100%;
       }
 
       p {
@@ -189,21 +204,12 @@ import { songs } from "../../Content/Songs.mjs";
   }
 
   .song-details.visible {
-    margin-left: 0.6em;
+    padding-left: 0.6em;
     width: auto;
     height: auto;
     opacity: 1;
     gap: 5px;
     interpolate-size: allow-keywords;
-  }
-
-  .play-icon {
-    width: 0;
-      height: 0;
-      opacity: 0;
-      transition: all 0.2s ease;
-      margin: 0;
-      padding: 0;
   }
 </style>
 

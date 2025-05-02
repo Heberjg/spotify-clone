@@ -9,7 +9,7 @@ node_modules/
 
 # json
 package-lock.json
-
+git 
 # logs
 npm-debug.log*
 yarn-debug.log*

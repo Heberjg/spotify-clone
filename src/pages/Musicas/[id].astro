@@ -2,23 +2,19 @@
 import { songs } from "../../Content/Songs.mjs";
 import Layout from "../../layouts/Layout.astro";
 import Reproducir from "../../components/Footer/FooterIcons/Reproducir.astro";
-export async function getStaticPaths() {
-  
-  return songs.map((song) => ({
-    params: {id: song.id},
-    props: { song },
-  }))
-}
-const { song } = Astro.props
+
 const { id } = Astro.params;
-// const Playlist = songs.find((song) => song.id === id)
+const song = songs.find(song => song.id === id);
 
-// Si no existe, redirigir a 404
+
 if (!song) {
-  return Astro.redirect('/404');
+  return new Response(null, {
+    status: 404,
+    statusText: "Not Found"
+  });
 }
 
-const {Name, Artist, Image, type } = song;
+const { Name, Artist, Image, type } = song;
 ---
 
 

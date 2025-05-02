@@ -5,5 +5,9 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
+    ssr: {
+      external: ['react', 'react-dom']
+    }
   },
+  output: 'server'
 });

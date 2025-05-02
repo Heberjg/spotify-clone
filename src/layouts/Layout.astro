@@ -3,6 +3,8 @@ import Header from '../components/Header/Header.astro';
 import SideBar from '../components/sidebar/sideBar.astro';
 import Footer from '../components/Footer/Footer.astro';
 import { ViewTransitions } from 'astro:transitions';
+import { Player } from '../components/Footer/FooterComponents/Player.mjs';
+
 ---
 
 <!doctype html>
@@ -13,17 +15,20 @@ import { ViewTransitions } from 'astro:transitions';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Astro Basics</title>
-		<ViewTransitions fallback="none" />
+		<ViewTransitions fallback='none' />
 	</head>
 	<body class="gap-2 p-2">
 		<Header />
-		<SideBar  />
+		<SideBar/>
 		<main class="flex rounded-lg shadow-lg overflow-hidden place-content-center">
 			<slot />
 		</main>
 		<Footer />
 	</body>
 </html>
+
+<script>
+	</script>
 
 <style>
 	@import "tailwindcss";
