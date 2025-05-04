@@ -1,10 +1,14 @@
-
-
+import PrimeraImangen from "../assets/Primera-imagen.jpg"
+import SegundaImangen from "../assets/Segunda-imagen.jpg"
+import TerceraImangen from "../assets/Tercer-imagen.jpg"
+import CuartaImangen from "../assets/Cuarta-imagen.jpg"
+import QuintaImangen from "../assets/Quinta-imagen.jpg"
 
 export const songs = [
   {Name: "Primera Cancion",
   Artist: "Primer Artist", 
-  Image: "/Primera-musica/Primera-imagen.jpg",
+  Image: PrimeraImangen,
+  // img: "../assets/Primera-imagen.jpg",
   Audio: "/Primera-musica/Primer-audio.mp3", 
   type: "song",
   id: "1",
@@ -12,7 +16,8 @@ export const songs = [
 
   {Name: "Segunda Cancion",
   Artist: "Segundo Artist",
-  Image: "/Segunda-musica/Segunda-imagen.jpg",
+  Image: SegundaImangen,
+  // img: "../assets/Primera-imagen.jpg",
   Audio: "/Segunda-musica/Segundo-audio.mp3",
   type: "song",
   id: "2",
@@ -20,7 +25,8 @@ export const songs = [
 
   {Name: "Tercera Cancion",
   Artist: "Tercer Artist",
-  Image: "/Tercera-musica/Tercer-imagen.jpg",
+  Image: TerceraImangen,
+  // img: "../assets/Primera-imagen.jpg",
   Audio: "/Tercera-musica/Tercer-audio.mp3",
   type: "song",
   id: "3",
@@ -28,7 +34,8 @@ export const songs = [
 
   {Name: "Cuarta Cancion",
   Artist: "Cuarto Artist",
-  Image: "/Cuarta-musica/Cuarta-imagen.jpg",
+  Image:  CuartaImangen,
+  // img: "../assets/Primera-imagen.jpg",
   Audio: "/Cuarta-musica/Cuarto-audio.mp3",
   type: "song",
   id: "4",
@@ -36,7 +43,8 @@ export const songs = [
 
   {Name: "Quinta Cancion",
   Artist: "Quinto Artist",
-  Image: "/Quinta-musica/Quinta-imagen.jpg",
+  Image: QuintaImangen,
+  // img: "../assets/Primera-imagen.jpg",
   Audio: "/Quinta-musica/Quinto-audio.mp3",
   type: "song",
   id: "5",

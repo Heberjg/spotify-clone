@@ -5,10 +5,12 @@ import Reproducir from "./FooterIcons/Reproducir.astro"
 import Siguiente from "./FooterIcons/Siguiente.astro"
 import Volumen from "./FooterIcons/Volumen.astro"
 import Repetir from "./FooterIcons/Repetir.astro"
+import NowPlaying from "./FooterComponents/NowPlaying.astro"
 ---
 
 <footer class="flex justify-between h-18 place-items-center"   transition:persist="Footer-state">
   <div id="Container-Listening-Song" class="flex">
+    <NowPlaying />
   </div>
   <div id="Container-Controls-Audio" class="flex flex-col gap-3 place-items-center">
     <div id="Controls-Audio" class="flex gap-2 place-items-center">
@@ -58,8 +60,6 @@ import Repetir from "./FooterIcons/Repetir.astro"
 <script>
   import { Player } from "../Footer/FooterComponents/Player.mjs"
   Player()
-//   document.addEventListener('DOMContentLoaded', Player);
-// document.addEventListener('astro:after-swap', Player);
 </script>
 
 <style>

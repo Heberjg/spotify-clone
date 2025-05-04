@@ -1,12 +1,10 @@
 
-import { songs } from "../../../Content/Songs.mjs";
+import { songs } from "../../../assets/Songs.mjs";
 import { playerStore } from "../../../store/playerStore.mjs";
 
 export async function Player() {
   const AudioPlayButton = document.getElementById("Audio-Play");
   const Audio = document.getElementById("Audio");
-  // let currentAudio = Audio;
-  // playerStore.setState({ currentAudio: Audio });
 
   // Función para manejar play/pause en todos los butones
 const setupButtons = () => {
@@ -20,8 +18,6 @@ const setupButtons = () => {
       }
     });
 
-    
-
     // Botones del SIDEBAR
     document.querySelectorAll(".Song-button-aside").forEach(button => {
       button.addEventListener("click", () => {
@@ -30,7 +26,6 @@ const setupButtons = () => {
       });
     });
   };
-
 
   // Actualización del botón de play/pause
   const updatePlayButton = () => {
@@ -48,23 +43,6 @@ const setupButtons = () => {
     }
 
     
-  // 2. Actualizar botones de canciones del MAIN (independientes)
-  const mainButtons = document.querySelectorAll(".Play-button");
-  mainButtons.forEach((button) => {
-    const songId = button.getAttribute("data-id");
-    const isCurrentSong = currentSongId === songId
-    const iconPath = button.querySelector("svg > path");
-    
-    if (iconPath) {
-      if (isCurrentSong && isPlaying && currentLocation === 'main') {
-        iconPath.setAttribute("d", "M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z");
-        button.setAttribute("aria-label", "Pausar");
-      } else {
-        iconPath.setAttribute("d", "M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z");
-        button.setAttribute("aria-label", "Reproducir");
-      }
-    }
-  });
 
   // 3. Actualizar botones del SIDEBAR (independientes)
   const sidebarButtons = document.querySelectorAll(".Song-button-aside");

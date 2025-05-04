@@ -1,0 +1,12 @@
+---
+import { Image } from "astro:assets";
+const { image, alt, loading = 'eager' } = Astro.props;
+---
+
+<Image 
+  src={image} 
+  alt={alt} 
+  loading={loading}
+  formats={['avif', 'webp']}
+  quality={80}
+/>

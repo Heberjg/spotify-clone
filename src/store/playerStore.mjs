@@ -1,13 +1,21 @@
 
-let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) || {
-  currentSongId: null,
-  isPlaying: false,
-  currentLocation: null,
-  currentAudio: null,
+let currentState = typeof sessionStorage !== 'undefined' 
+  ? JSON.parse(sessionStorage.getItem('music-player-storage')) || {
+      currentSongId: null,
+      isPlaying: false,
+      currentLocation: null,
+      currentAudio: null,
+      currentSongData: null,
+    }
+  : {
+      currentSongId: null,
+      isPlaying: false,
+      currentLocation: null,
+      currentAudio: null,
+      currentSongData: null,
+    };
 
-};
-
-import { songs } from "../Content/Songs.mjs"
+import { songs } from "../assets/Songs.mjs"
 
 const subscribers = new Set();
 
@@ -16,14 +24,17 @@ export const playerStore = {
   
   setState: (newState) => {
     currentState = { ...currentState, ...newState };
-    // Solo guardamos en sessionStorage los datos esenciales
-    const { currentSongId, isPlaying, currentLocation } = currentState;
     sessionStorage.setItem('music-player-storage', 
-      JSON.stringify({ currentSongId, isPlaying, currentLocation })
+      JSON.stringify({
+        currentSongId: currentState.currentSongId,
+        currentLocation: currentState.currentLocation,
+        currentSongData: currentState.currentSongData,
+        // isplaying no se guarda para evitar la reproduccion automatica al recargar, solucion simple
+      })
     );
     subscribers.forEach(cb => cb(currentState));
   },
-  
+
   subscribe: (callback) => {
     subscribers.add(callback);
     return () => subscribers.delete(callback);
@@ -53,7 +64,6 @@ export const playerStore = {
         return;
       }
     }
-  
     //  Caso 2: Misma canción diferente ubicación o canción nueva
     
   try {
@@ -62,7 +72,6 @@ export const playerStore = {
       currentAudio.pause();
     } 
       // Configurar nueva canción
-
       currentAudio.src = song.Audio;
       currentAudio.dataset.id = songId;
   
@@ -70,6 +79,11 @@ export const playerStore = {
       await currentAudio.play();
       playerStore.setState({ 
         currentSongId: songId,
+        currentSongData: { // Agrega este objeto con toda la info
+          name: song.Name,
+          artist: song.Artist,
+          image: song.Image,
+        },
         isPlaying: true,
         currentLocation: location,
         currentAudio

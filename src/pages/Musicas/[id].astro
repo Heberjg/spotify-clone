@@ -1,8 +1,8 @@
 ---
-import { songs } from "../../Content/Songs.mjs";
+import { songs } from "../../assets/Songs.mjs";
 import Layout from "../../layouts/Layout.astro";
 import Reproducir from "../../components/Footer/FooterIcons/Reproducir.astro";
-
+import SongImage from "../../components/SongImage.astro";
 const { id } = Astro.params;
 const song = songs.find(song => song.id === id);
 
@@ -21,8 +21,16 @@ const { Name, Artist, Image, type } = song;
 <Layout>
   <div class="Card-song flex flex-col gap-3 p-3 rounded-lg transition-all duration-300 ease-in-out cursor-pointer" tabindex="0" role="button" transition:name=`Playlist ${id} box`>
     <div class="flex relative">
-        <img src={Image} alt={Name} class="rounded-lg w-50" />
-        <button class="Play-button-card absolute border-none rounded-full p-0 m-0 cursor-pointer bg-green-500 hover:bg-green-400 transition-all duration-300 ease-in-out" aria-label="Reproducir" >
+      <SongImage 
+      image={Image} 
+      alt={`Portada de ${Name} por ${Artist}`}
+      style={{
+        
+      }
+
+      }
+      />
+        <button data-id={id} class="Play-button-card absolute border-none rounded-full p-0 m-0 cursor-pointer bg-green-500 hover:bg-green-400 transition-all duration-300 ease-in-out" aria-label="Reproducir" >
         <span class="fill-neutral-900 flex">
             <Reproducir />
         </span>
@@ -35,3 +43,15 @@ const { Name, Artist, Image, type } = song;
     </div>
   </div>
 </Layout>
+
+
+<style>
+  .relative {
+
+    img {
+      height: clamp(200px, 18vw, 300px);
+      width: auto;
+      border-radius: 8px;
+    }
+  }
+</style>

@@ -1,10 +1,9 @@
 ---
 // import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-import { songs } from '../Content/Songs.mjs';
-
+import { songs } from '../assets/Songs.mjs';
+import SongImage from '../components/SongImage.astro';
 import Reproducir from '../components/Footer/FooterIcons/Reproducir.astro';
-import { playerStore } from '../store/playerStore.mjs';
 const shuffledSongs = [...songs];
 shuffledSongs.sort(() => Math.random() - 0.5);
 const randomSongs = shuffledSongs.slice(0, 4);
@@ -23,7 +22,10 @@ const randomSongs = shuffledSongs.slice(0, 4);
                         const { id, Name, Image, Artist } = song
                         return (
                             <div class="relative">
-                                <img src={Image} alt={Name} class="rounded-lg"/>
+                                <SongImage 
+                                image={Image} 
+                                alt={`Portada de ${Name} por ${Artist}`}
+                                />
                                 <a href={`/Musicas/${id}`} class="flex place-items-center h-full w-full">
                                     <span class="card-detail text-neutral-100 text-sm">{Name}</span>
                                 </a>
@@ -56,7 +58,10 @@ const randomSongs = shuffledSongs.slice(0, 4);
                             return (
                                 <div class="Card-song flex flex-col gap-3 p-3 rounded-lg transition-all duration-300 ease-in-out cursor-pointer z-0" tabindex="0" role="button" >
                                     <div class="flex justify-center place-items-center relative" transition:name=`Playlist ${id} box` >
-                                        <img src={Image} alt={Name} class="rounded-lg z-0" transition:name=`Playlist ${id} Image` />
+                                        <SongImage 
+                                        image={Image} 
+                                        alt={`Portada de ${Name} por ${Artist}`}
+                                        />
                                         <button data-id={id} class=" Play-button Play-main border-none rounded-full p-0 m-0 cursor-pointer bg-green-500 hover:bg-green-400 transition-all duration-200 ease-in-out" aria-label="Reproducir" >
                                             <span class="fill-neutral-900 flex">
                                                 <Reproducir/>
@@ -81,23 +86,18 @@ const randomSongs = shuffledSongs.slice(0, 4);
 <script>
     import { LinkClick } from "../components/LinkClick.mjs";
     import { mainbutton } from "../components/Footer/FooterComponents/Mainbuttons.mjs";
-
-    let cleanupFunctions = [];
+    let cleanupMainButtons;
 
 const initialize = () => {
     LinkClick();
-    
+    cleanupMainButtons?.();
   // Configurar botones y guardar función de limpieza
-    cleanupFunctions.push(mainbutton());
-};
-
-const cleanup = () => {
-    cleanupFunctions = [];
+  
+  cleanupMainButtons = mainbutton();
 };
 
 document.addEventListener("DOMContentLoaded", initialize);
 document.addEventListener("astro:after-swap", initialize);
-document.addEventListener("astro:before-swap", cleanup);
 </script>
 
 <style>
@@ -149,6 +149,7 @@ document.addEventListener("astro:before-swap", cleanup);
         img {
             border-radius: 8px 0 0 8px;
             width: clamp(48px, 6vw, 80px);
+            height: auto;
         }
 
         .card-detail {
@@ -262,6 +263,8 @@ document.addEventListener("astro:before-swap", cleanup);
             }
             img {
                 height: clamp(130px, 18vw, 180px);
+                width: auto;
+                border-radius: 8px;
             }
             
         }

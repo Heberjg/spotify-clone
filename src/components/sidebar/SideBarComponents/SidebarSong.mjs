@@ -1,10 +1,5 @@
 
-let isInitialized = false;
-
 export const SideBarSong = () => {
- // Evitar duplicación de listeners
-if (isInitialized) return;
-
 
 // Abrir Biblioteca 
 const openLibraryButton = document.getElementById("abrir-biblioteca");
@@ -13,30 +8,26 @@ const ContainerEtiqueta = document.getElementById("Container-Etiquetas");
 const ContainerSongSearch = document.getElementById("Container-Song-Searcher");
 const SongSearcher = document.getElementById("Song-searcher");
 const SongDetails = document.querySelectorAll(".song-details");
-const sidebar = document.getElementById("sidebar");
 
+
+let isExpanded = false
 
 openLibraryButton?.addEventListener("click", () => {
-  const isExpanded = sidebar?.getAttribute("aria-expanded") === "true";
-  sidebar?.setAttribute("aria-expanded", !isExpanded);
-  if (isInitialized) {
-    localStorage.setItem('sidebar-expanded', !isExpanded);
-    isInitialized = false;
-  } else {
-    localStorage.setItem('sidebar-expanded', !isExpanded);
-    isInitialized = false;
+  // Invertir el estado actual
+  isExpanded = !isExpanded;
+    
+  // Actualizar clases del header
+  if (headerAside) {
+    headerAside.classList.toggle("Expanded", isExpanded);
+    headerAside.classList.toggle("NotExpanded", !isExpanded);
   }
   
-  // Alternar clases del headerAside
-  headerAside?.classList.toggle("Expanded", !isExpanded);
-  headerAside?.classList.toggle("NotExpanded", isExpanded);
-  
   // Actualizar visibilidad de elementos
-  toggleVisibility(!isExpanded);
+  toggleVisibility(isExpanded);
 })
 
+
 function toggleVisibility(show) {
-  
   
   ContainerEtiqueta?.classList.toggle("InvisibleItem", !show);
   ContainerEtiqueta?.classList.toggle("VisibleItem", show);

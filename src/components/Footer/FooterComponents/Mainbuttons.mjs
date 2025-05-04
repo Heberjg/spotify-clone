@@ -1,32 +1,7 @@
 // Botones de canciones del MAIN
 import { playerStore } from "../../../store/playerStore.mjs";
 
-const handlers = new Set();
-
 export const mainbutton = () => {
-  handlers.forEach(({element, handler}) => {
-    element.removeEventListener('click', handler);
-  });
-  handlers.clear();
-
-  const handleButtonClick = (event) => {
-    const button = event.currentTarget;
-    const songId = button.getAttribute("data-id");
-    playerStore.playSong(songId, 'main');
-  };
-
-  // Registrar nuevos listeners
-  document.querySelectorAll(".Play-button").forEach(button => {
-    button.addEventListener("click", handleButtonClick);
-    handlers.add({element: button, handler: handleButtonClick});
-  });
-
-  // Actualización inicial
-  updateMainButtons();
-  
-  // Suscribirse a cambios en el store
-  return playerStore.subscribe(updateMainButtons);
-};
 
 const updateMainButtons = () => {
   const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
@@ -46,3 +21,26 @@ const updateMainButtons = () => {
     }
   });
 };
+
+// Suscribirse a cambios en el store
+const unsubscribe = playerStore.subscribe(updateMainButtons);
+
+// Configurar listeners iniciales
+document.querySelectorAll(".Play-button").forEach(button => {
+  button.addEventListener("click", () => {
+    const songId = button.getAttribute("data-id");
+    playerStore.playSong(songId, 'main');
+  });
+});
+
+// Actualización inicial
+updateMainButtons();
+
+// Retornar función de limpieza
+return () => {
+  unsubscribe();
+  document.querySelectorAll(".Play-button").forEach(button => {
+    button.replaceWith(button.cloneNode(true)); // Limpia todos los listeners
+  });
+};
+}
