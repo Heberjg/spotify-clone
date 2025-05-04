@@ -3,7 +3,6 @@ import Header from '../components/Header/Header.astro';
 import SideBar from '../components/sidebar/sideBar.astro';
 import Footer from '../components/Footer/Footer.astro';
 import { ViewTransitions } from 'astro:transitions';
-
 ---
 
 <!doctype html>
@@ -23,8 +22,14 @@ import { ViewTransitions } from 'astro:transitions';
 			<slot />
 		</main>
 		<Footer />
+
 	</body>
 </html>
+
+<script is:inline>
+  import { inject } from '@vercel/analytics';
+  inject();
+</script>
 
 
 <style>

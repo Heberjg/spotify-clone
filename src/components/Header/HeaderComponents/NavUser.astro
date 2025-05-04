@@ -5,7 +5,7 @@
   <figure class="m-0 flex place-items-center">
     <img   src="https://i.pinimg.com/736x/fa/d5/e7/fad5e79954583ad50ccb3f16ee64f66d.jpg" alt="" id="Image-User" class=" rounded-full place-items-center" />
   </figure>
-  <nav class="flex absolute bg-neutral-800 rounded-lg p-1 top-14 right-0  text-neutral-300 text-[1em] font-medium shadow-lg transition-all duration-200 ease-in-out text-nowrap invisible overflow-hidden" id="Container-user-nav" aria-hidden="true"  aria-labelledby="Container-user">
+  <nav class="flex absolute bg-neutral-800 rounded-lg p-1 top-14 right-0  text-neutral-300 text-[1em] font-medium shadow-lg transition-all duration-200 ease-in-out text-nowrap invisible overflow-hidden" id="Container-user-nav" aria-hidden="true"  aria-labelledby="Container-user " >
     <ul class="User-list-nav flex flex-col gap-2 p-0 m-0 list-style-none w-45" >
       <li class="User-list-item">
         <a href="/#" aria-label="Cuenta">Cuenta</a>
@@ -39,10 +39,8 @@ userButton?.addEventListener('click', (e) => {
   const isExpanded = userButton.getAttribute('aria-expanded') === 'true';
   closeMenu();
   if (!isExpanded) {
-      setTimeout(() => {
-          const firstItem = userMenu?.querySelector('a');
-          firstItem?.focus();
-      }, 50);
+        const firstItem = userMenu?.querySelector('a');
+        firstItem?.focus();
   }
 });
 
