@@ -148,8 +148,8 @@ document.addEventListener("astro:after-swap", initialize);
 
         img {
             border-radius: 8px 0 0 8px;
-            width: clamp(48px, 6vw, 80px);
-            height: auto;
+            width: clamp(48px, 6vw, 80px); !important;
+            height: auto; !important;
         }
 
         .card-detail {
@@ -262,8 +262,8 @@ document.addEventListener("astro:after-swap", initialize);
                 }
             }
             img {
-                height: clamp(130px, 18vw, 180px);
-                width: auto;
+                height: clamp(130px, 18vw, 180px); !important;
+                width: auto; !important;
                 border-radius: 8px;
             }
             
@@ -300,5 +300,4 @@ document.addEventListener("astro:after-swap", initialize);
         }
     }
 </style>
-
 
