@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import vercel from '@astrojs/vercel';
+import image from '@astrojs/image'
 
 // https://astro.build/config
 export default defineConfig({
@@ -9,5 +10,8 @@ export default defineConfig({
     plugins: [tailwindcss()],
   },
   output: 'server',
-  adapter: vercel()
+  adapter: vercel(),
+  integrations: [image({
+    serviceEntryPoint: '@astrojs/image/sharp'
+  })]
 });
