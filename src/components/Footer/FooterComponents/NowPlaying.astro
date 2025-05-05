@@ -1,62 +1,59 @@
 ---
 // components/NowPlaying.astro
-import { getImage } from 'astro:assets';
+import { Image } from 'astro:assets';
 import placeholderImage from "../../../assets/background.svg";
 
-// Obtener la imagen inicial (placeholder)
-const imageSrc = placeholderImage
+// truco para que funcione el image de una vez por todas
+const imageSrc =  placeholderImage;
 ---
   <!-- Contenedor para la canción -->
   <div id="current-song-display">
     <img
       src={imageSrc.src}
-      alt="Portada de canción"
-      width="50"  
-      height="50"
+      alt={"Portada de canción"}
+      width={50}  
+      height={50}
+      
       id="song-image"
     />
     <div class="song-info">
-      <h3 id="song-title"></h3>
-      <p id="song-artist"></p>
+      <h3 id="song-title">
+      </h3>
+      <p id="song-artist">
+      </p>
     </div>
   </div>
+  
 
-  <script>
+  <script >
     import { playerStore } from "../../../store/playerStore.mjs";
-    
-    // Función para actualizar la imagen
-    async function updateSongImage(imageUrl) {
-      try {
-        const response = await fetch(imageUrl);
-        if (!response.ok) throw new Error('Image not found');
-        
-        const songImage = document.getElementById('song-image') as HTMLImageElement;
-        songImage.src = imageUrl;
-      } catch (error) {
-        console.error('Error loading image:', error);
-        // Puedes establecer una imagen por defecto aquí si falla
-      }
-    }
-
     // Suscripción a cambios en el store
-    const unsubscribe = playerStore.subscribe(async (state) => {
+    let currentImageUrl = '';
+    const unsubscribe = playerStore.subscribe((state) => {
       const { currentSongData } = state;
+      const songImage = document.getElementById('song-image') as HTMLImageElement;
       const songTitle = document.getElementById('song-title');
       const songArtist = document.getElementById('song-artist');
+      // const currentDisplay = document.getElementById('current-song-display');
+      // const noSongMessage = document.getElementById('no-song-message');
 
       if (currentSongData) {
         // Actualizar elementos con los datos de la canción
-        if (currentSongData.image?.src) {
-          await updateSongImage(currentSongData.image.src);
-        }
+        const newImageUrl = currentSongData.image?.src || '';
+      if (newImageUrl && newImageUrl !== currentImageUrl) { 
+        currentImageUrl = newImageUrl;
+        songImage.src = currentSongData.image.src || '';
+      songImage.alt = `Portada de ${currentSongData.name}`;
+    }
         songTitle.textContent = currentSongData.name;
         songArtist.textContent = currentSongData.artist;
-      }
+      } 
     });
 
     // Limpieza al desmontar
     window.addEventListener('beforeunload', unsubscribe);
   </script>
+
 
 <style>
   

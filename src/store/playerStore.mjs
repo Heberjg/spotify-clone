@@ -81,7 +81,7 @@ export const playerStore = {
         currentSongData: { 
           name: song.Name,
           artist: song.Artist,
-          image: song.Image,
+          image: song.img,
         },
         isPlaying: true,
         currentLocation: location,
