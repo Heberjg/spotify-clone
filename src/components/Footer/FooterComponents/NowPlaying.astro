@@ -11,17 +11,18 @@ const imageSrc =  placeholderImage;
     <Image
       src={imageSrc}
       alt={"Portada de canción"}
-      width={50}
+      width={50}  
       height={50}
-      formats={['webp']}
-      quality={80}
       loading="eager"
+      decoding="async"
+      formats={['avif', 'webp']}
+      quality={70}
       id="song-image"
     />
     <div class="song-info">
-      <h3 id="song-title" class="song-title">
+      <h3 id="song-title">
       </h3>
-      <p id="song-artist" class="song-artist">
+      <p id="song-artist">
       </p>
     </div>
   </div>
@@ -52,11 +53,6 @@ const imageSrc =  placeholderImage;
   </script>
 
 <style>
-  .now-playing-container {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
   
   #current-song-display {
     display: flex;
@@ -64,9 +60,10 @@ const imageSrc =  placeholderImage;
     gap: 1rem;
   }
   
-  .song-image {
+  #song-image {
     border-radius: 4px;
-    object-fit: cover;
+    width: 55px;
+    height: auto;
   }
   
   .song-info {
@@ -74,21 +71,21 @@ const imageSrc =  placeholderImage;
     flex-direction: column;
   }
   
-  .song-title {
+  #song-title {
     margin: 0;
     font-size: 1rem;
     font-weight: 500;
+    text-wrap: nowrap;
+    overflow: hidden;
   }
   
-  .song-artist {
+  #song-artist {
     margin: 0;
     font-size: 0.875rem;
-    color: #666;
+    color: #888;
+    overflow: hidden;
+    text-wrap: nowrap
   }
   
-  #no-song-message {
-    margin: 0;
-    color: #666;
-    font-style: italic;
-  }
+  
 </style>

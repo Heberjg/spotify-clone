@@ -1,9 +1,16 @@
 ---
+import { Image } from "astro:assets"
+import ProfilePhoto from "../../../assets/Profile-photo.jpg"
 ---
 
 <button type="button" class="place-items-center flex bg-neutral-800 rounded-full p-2 border-none m-0 hover:bg-neutral-700 transition-all duration-200 ease-in-out cursor-pointer relative" id="Container-user" aria-expanded="false" aria-label="Menú de Usuario" aria-controls="Container-user-nav" aria-haspopup="true" tabindex="0" >
   <figure class="m-0 flex place-items-center">
-    <img   src="https://i.pinimg.com/736x/fa/d5/e7/fad5e79954583ad50ccb3f16ee64f66d.jpg" alt="" id="Image-User" class=" rounded-full place-items-center" />
+    <Image src={ProfilePhoto} 
+    alt="Foto de perfil" 
+    id="Image-User" 
+    class="rounded-full place-items-center" 
+    width={50}
+    height={50}/>
   </figure>
   <nav class="flex absolute bg-neutral-800 rounded-lg p-1 top-14 right-0  text-neutral-300 text-[1em] font-medium shadow-lg transition-all duration-200 ease-in-out text-nowrap invisible overflow-hidden" id="Container-user-nav" aria-hidden="true"  aria-labelledby="Container-user " >
     <ul class="User-list-nav flex flex-col gap-2 p-0 m-0 list-style-none w-45" >

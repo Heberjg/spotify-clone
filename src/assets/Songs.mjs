@@ -1,8 +1,8 @@
-import PrimeraImangen from "../assets/Primera-imagen.jpg"
-import SegundaImangen from "../assets/Segunda-imagen.jpg"
-import TerceraImangen from "../assets/Tercer-imagen.jpg"
-import CuartaImangen from "../assets/Cuarta-imagen.jpg"
-import QuintaImangen from "../assets/Quinta-imagen.jpg"
+import PrimeraImangen from "../assets/Primera-imagen.webp"
+import SegundaImangen from "../assets/Segunda-imagen.webp"
+import TerceraImangen from "../assets/Tercer-imagen.webp"
+import CuartaImangen from "../assets/Cuarta-imagen.webp"
+import QuintaImangen from "../assets/Quinta-imagen.webp"
 
 export const songs = [
   {Name: "Primera Cancion",
@@ -17,7 +17,6 @@ export const songs = [
   {Name: "Segunda Cancion",
   Artist: "Segundo Artist",
   Image: SegundaImangen,
-  // img: "../assets/Primera-imagen.jpg",
   Audio: "/Segunda-musica/Segundo-audio.mp3",
   type: "song",
   id: "2",
