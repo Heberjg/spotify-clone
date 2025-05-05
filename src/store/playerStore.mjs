@@ -76,10 +76,9 @@ export const playerStore = {
       currentAudio.dataset.id = songId;
   
       // Reproducir
-      await currentAudio.play();
-      playerStore.setState({ 
+      await playerStore.setState({ 
         currentSongId: songId,
-        currentSongData: { // Agrega este objeto con toda la info
+        currentSongData: { 
           name: song.Name,
           artist: song.Artist,
           image: song.Image,
@@ -88,6 +87,7 @@ export const playerStore = {
         currentLocation: location,
         currentAudio
       });
+      currentAudio.play();
 
   } catch (error) {
     console.error("Error al reproducir:", error);

@@ -6,6 +6,8 @@ const { image, alt, loading = 'eager' } = Astro.props;
 <Image 
   src={image} 
   alt={alt} 
+  width={300}  
+  height={300}
   loading={loading}
   formats={['avif', 'webp']}
   quality={80}
