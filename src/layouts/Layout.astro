@@ -26,6 +26,12 @@ import { ViewTransitions } from 'astro:transitions';
 	</body>
 </html>
 
+<script>
+	import { injectSpeedInsights } from '@vercel/speed-insights';
+
+injectSpeedInsights();
+</script>
+
 
 <style>
 	@import "tailwindcss";
