@@ -1,58 +1,66 @@
 ---
 // components/NowPlaying.astro
-import { Image } from 'astro:assets';
 import placeholderImage from "../../../assets/background.svg";
-
-// truco para que funcione el image de una vez por todas
-const imageSrc =  placeholderImage;
 ---
-  <!-- Contenedor para la canción -->
-  <div id="current-song-display">
+<div id="current-song-display">
+  <picture>
+    <source id="dynamic-image-source" type="image/webp" srcset={placeholderImage.src}/>
     <img
-      src={imageSrc.src}
-      alt={"Portada de canción"}
-      width={50}  
-      height={50}
-      
       id="song-image"
+      width={50}
+      height={50}
+      loading="eager"
+      decoding="async"
+      alt="Portada de canción"
+      class="song-image"
     />
-    <div class="song-info">
-      <h3 id="song-title">
-      </h3>
-      <p id="song-artist">
-      </p>
-    </div>
+  </picture>
+  <div class="song-info">
+    <h3 id="song-title"></h3>
+    <p id="song-artist"></p>
   </div>
+</div>
+
+<script>
+  import { playerStore } from "../../../store/playerStore.mjs";
+  import placeholderImage from "../../../assets/background.svg";
+ 
+  const songImage = document.getElementById('song-image') as HTMLImageElement;
+  const imageSource = document.getElementById('dynamic-image-source') as HTMLImageElement;
+  const songTitle = document.getElementById('song-title');
+  const songArtist = document.getElementById('song-artist');
   
-
-  <script >
-    import { playerStore } from "../../../store/playerStore.mjs";
-    // Suscripción a cambios en el store
-    let currentImageUrl = '';
-    const unsubscribe = playerStore.subscribe((state) => {
-      const { currentSongData } = state;
-      const songImage = document.getElementById('song-image') as HTMLImageElement;
-      const songTitle = document.getElementById('song-title');
-      const songArtist = document.getElementById('song-artist');
-      // const currentDisplay = document.getElementById('current-song-display');
-      // const noSongMessage = document.getElementById('no-song-message');
-
-      if (currentSongData) {
-        // Actualizar elementos con los datos de la canción
-        const newImageUrl = currentSongData.image?.src || '';
-      if (newImageUrl && newImageUrl !== currentImageUrl) { 
-        currentImageUrl = newImageUrl;
-        songImage.src = currentSongData.image.src || '';
-      songImage.alt = `Portada de ${currentSongData.name}`;
+  let currentImageUrl = '';
+  
+  const unsubscribe = playerStore.subscribe((state) => {
+    const { currentSongData } = state || {};
+    const newImageUrl = currentSongData?.image?.src || '';
+    
+    if (newImageUrl !== currentImageUrl) {
+      currentImageUrl = newImageUrl;
+      
+      const loader = new Image();
+      loader.src = newImageUrl;
+      
+      loader.onload = () => {
+        imageSource.srcset = newImageUrl;
+        songImage.src = newImageUrl;
+        songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
+      };
+      
+      loader.onerror = () => {
+        songImage.src = placeholderImage.src;
+      };
     }
-        songTitle.textContent = currentSongData.name;
-        songArtist.textContent = currentSongData.artist;
-      } 
-    });
+    
+    if (currentSongData) {
+      songTitle.textContent = currentSongData.name || '';
+      songArtist.textContent = currentSongData.artist || '';
+    }
+  });
 
-    // Limpieza al desmontar
-    window.addEventListener('beforeunload', unsubscribe);
-  </script>
+  window.addEventListener('beforeunload', unsubscribe);
+</script>
 
 
 <style>

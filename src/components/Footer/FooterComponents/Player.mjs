@@ -66,6 +66,8 @@ const setupButtons = () => {
   // Eventos del reproductor
   const setupAudioEvents = () => {
     if (!Audio) return;
+
+    Audio.preload = 'metadata';
     
     ['play', 'pause', 'ended'].forEach(event => {
       Audio.addEventListener(event, () => {
@@ -73,6 +75,12 @@ const setupButtons = () => {
           isPlaying: event === 'play' 
         });
       });
+    });
+
+    Audio.addEventListener('progress', () => {
+      if (Audio.buffered.length > 0) {
+        playerStore.setState({ buffered: Audio.buffered.end(0) });
+      }
     });
   };
 
