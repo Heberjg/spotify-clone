@@ -4,7 +4,7 @@ import { getImage } from 'astro:assets';
 import placeholderImage from "../../../assets/background.svg";
 
 // Obtener la imagen inicial (placeholder)
-const imageSrc = await getImage({src: placeholderImage});
+const imageSrc = placeholderImage
 ---
   <!-- Contenedor para la canción -->
   <div id="current-song-display">
