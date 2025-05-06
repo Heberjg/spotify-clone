@@ -78,7 +78,7 @@ const setupButtons = () => {
 };
 
   // Eventos del reproductor
-  const setupAudioEvents = () => {
+  const setupAudioEvents = async () => {
     if (!Audio) return;
 
     ['play', 'pause', 'ended'].forEach(event => {
@@ -93,12 +93,11 @@ const setupButtons = () => {
     // Restaurar estado si hay una canción guardada
     const initialize =  async() => {
       playerStore.setState({ currentAudio: Audio });
-      setupAudioEvents();
-      Audio.preload = 'metadatos';
+      await setupAudioEvents();
       setupButtons();
       
       // Restaurar estado
-      const { currentSongId } = playerStore.getState();
+      const { currentSongId, currentLocation } = playerStore.getState();
       try {
         if (currentSongId) {
           const song = songs.find(s => s.id === currentSongId);

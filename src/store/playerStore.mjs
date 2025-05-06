@@ -5,6 +5,11 @@ let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) ||
       currentLocation: null,
       currentAudio: null,
       currentSongData: null,
+      buffering: {
+        buffered: 0,           // Tiempo en segundos bufferizado
+        percentage: 0,         // Porcentaje cargado (0-100)
+        isBuffering: false,    // Si está cargando actualmente
+      }
     }
   
 
@@ -71,41 +76,71 @@ export const playerStore = {
           },
         })
       // Precargar el audio antes de cualquier cambio de estado
-      await new Promise((resolve, reject) => {
-        const handleLoaded = () => {
-          audioElement.removeEventListener('canplaythrough', handleLoaded);
-          audioElement.removeEventListener('error', handleError);
-          resolve();
-        };
-        
-        const handleError = (err) => {
-          audioElement.removeEventListener('canplaythrough', handleLoaded);
-          audioElement.removeEventListener('error', handleError);
-          reject(err);
-        };
-        
-        audioElement.addEventListener('canplaythrough', handleLoaded);
-        audioElement.addEventListener('error', handleError);
-        audioElement.load();
+      audioElement.onprogress = () => {
+        if (audioElement.buffered.length > 0) {
+          const bufferedEnd = audioElement.buffered.end(audioElement.buffered.length - 1);
+          const percent = (bufferedEnd / audioElement.duration) * 100;
+          console.log(percent)
+          playerStore.setState({
+            buffering: {
+              buffered: bufferedEnd,
+              percentage: percent,
+              isBuffering: false
+            }
+          });
+  
+          if (percent > 20 && audioElement.paused) {
+            audioElement.play().catch(e => console.log("Auto-play:", e));
+          }
+        }
+      };
+  
+      audioElement.onwaiting = () => {
+        playerStore.setState({
+          buffering: {
+            ...currentState.buffering,
+            isBuffering: true
+          }
+        });
+      };
+  
+      // 2. Precargar metadata (sin esperar buffer completo)
+      await new Promise((resolve) => {
+        audioElement.addEventListener('loadedmetadata', resolve, { once: true });
+        audioElement.load(); // Inicia la carga
       });
   
-      // Actualizar estado y reproducir
+      // 3. Actualizar estado y reproducir
       playerStore.setState({
         currentSongId: songId,
-        isPlaying: true,
         currentLocation: location,
         currentAudio: audioElement,
+        isPlaying: true,
+        buffering: {
+          buffered: 0,
+          percentage: 0,
+          isBuffering: true
+        }
       });
   
-      audioElement.play();
+      // 4. Reproducir (se auto-pausará si no hay buffer suficiente)
+      await audioElement.play().catch(e => {
+        console.log("Esperando buffer...");
+        // El evento 'waiting' manejará el estado
+      });
   
     } catch (error) {
       console.error("Error en playSong:", error);
       playerStore.setState({ 
         isPlaying: false,
         currentAudio: null,
+        buffering: {
+          isBuffering: false,
+          percentage: 0,
+          buffered: 0
+        }
       });
-      throw error; // Opcional: re-lanzar el error para manejo externo
+      throw error;
     }
   },
   
