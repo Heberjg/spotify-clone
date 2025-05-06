@@ -95,7 +95,7 @@ export const playerStore = {
         }
       };
   
-      audioElement.onwaiting = () => {
+      audioElement.onwaiting = () => {g
         playerStore.setState({
           buffering: {
             ...currentState.buffering,
