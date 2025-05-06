@@ -5,11 +5,6 @@ let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) ||
       currentLocation: null,
       currentAudio: null,
       currentSongData: null,
-      buffering: {
-        buffered: 0,           // Tiempo en segundos bufferizado
-        percentage: 0,         // Porcentaje cargado (0-100)
-        isBuffering: false,    // Si está cargando actualmente
-      }
     }
   
 
@@ -76,52 +71,39 @@ export const playerStore = {
           },
         })
       // Precargar el audio antes de cualquier cambio de estado
-      
-  
-      // Actualizar estado y reproducir
-      await playerStore.setState({
-        currentSongId: songId,
-        isPlaying: false,
-        currentLocation: location,
-        currentAudio: audioElement,
-        buffering: {
-          buffered: 0,
-          percentage: 0,
-          isBuffering: true,
-        }
+      await new Promise((resolve, reject) => {
+        const handleLoaded = () => {
+          audioElement.removeEventListener('canplaythrough', handleLoaded);
+          audioElement.removeEventListener('error', handleError);
+          resolve();
+        };
+        
+        const handleError = (err) => {
+          audioElement.removeEventListener('canplaythrough', handleLoaded);
+          audioElement.removeEventListener('error', handleError);
+          reject(err);
+        };
+        
+        audioElement.addEventListener('canplaythrough', handleLoaded);
+        audioElement.addEventListener('error', handleError);
+        audioElement.load();
       });
   
-      // Iniciar carga (la reproducción la controlará setupAudioEvents)
-      // Esperar a que haya metadata disponible
-    await new Promise((resolve) => {
-      audioElement.addEventListener('loadedmetadata', resolve, { once: true });
-      audioElement.load();
-    });
-
-    // Intentar reproducción inmediata si hay suficiente buffer
-    if (audioElement.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-      await audioElement.play();
-      playerStore.setState({ isPlaying: true });
-    } else {
-      // Si no hay suficiente buffer, setupAudioEvents manejará la reproducción después
-      audioElement.addEventListener('canplay', () => {
-        if (currentState.currentSongId === songId && !currentState.isPlaying) {
-          audioElement.play().catch(e => console.log("Auto-play prevented:", e));
-        }
-      }, { once: true });
-    }
+      // Actualizar estado y reproducir
+      playerStore.setState({
+        currentSongId: songId,
+        isPlaying: true,
+        currentLocation: location,
+        currentAudio: audioElement,
+      });
+  
+      audioElement.play();
   
     } catch (error) {
       console.error("Error en playSong:", error);
       playerStore.setState({ 
         isPlaying: false,
         currentAudio: null,
-        buffering: {
-          buffered: 0,
-          percentage: 0,
-          isBuffering: false,
-          lastUpdated: Date.now()
-        }
       });
       throw error; // Opcional: re-lanzar el error para manejo externo
     }

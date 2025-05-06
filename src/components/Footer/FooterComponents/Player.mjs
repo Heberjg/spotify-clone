@@ -80,79 +80,14 @@ const setupButtons = () => {
   // Eventos del reproductor
   const setupAudioEvents = () => {
     if (!Audio) return;
-  
-    // 1. Manejadores básicos
-    const handlePlay = () => playerStore.setState({ isPlaying: true });
-    const handlePause = () => playerStore.setState({ isPlaying: false });
-    const handleEnded = () => playerStore.setState({ isPlaying: false });
-  
-    // 2. Sistema avanzado de buffering
-    const updateBufferState = () => {
-      if (!Audio.buffered.length) return;
-      
-      const bufferedEnd = Audio.buffered.end(Audio.buffered.length - 1);
-      const percentage = Audio.duration ? (bufferedEnd / Audio.duration) * 100 : 0;
-      
-      playerStore.setState({
-        buffering: {
-          buffered: bufferedEnd,
-          percentage,
-          isBuffering: false
-        }
+
+    ['play', 'pause', 'ended'].forEach(event => {
+      Audio.addEventListener(event, () => {
+        playerStore.setState({ 
+          isPlaying: event === 'play' 
+        });
       });
-    };
-  
-    const handleWaiting = () => {
-      playerStore.setState({
-        buffering: {
-          ...currentState.buffering,
-          isBuffering: true
-        }
-      });
-      
-      // Inteligencia para reanudar automáticamente
-      const checkBufferAndPlay = () => {
-        if (Audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
-          Audio.play().catch(e => console.log("Reanudación automática:", e));
-        } else {
-          setTimeout(checkBufferAndPlay, 500);
-        }
-      };
-      checkBufferAndPlay();
-    };
-  
-    // 3. Configurar todos los listeners
-    const events = {
-      play: handlePlay,
-      pause: handlePause,
-      ended: handleEnded,
-      progress: updateBufferState,
-      waiting: handleWaiting,
-      canplay: () => playerStore.setState({
-        buffering: {
-          isBuffering: false
-        }
-      }),
-      error: () => playerStore.setState({ 
-        isPlaying: false,
-        buffering: {
-          isBuffering: false,
-          percentage: 0,
-          buffered: 0
-        }
-      })
-    };
-  
-    Object.entries(events).forEach(([event, handler]) => {
-      Audio.addEventListener(event, handler);
     });
-  
-    // 4. Función de limpieza
-    return () => {
-      Object.entries(events).forEach(([event, handler]) => {
-        Audio.removeEventListener(event, handler);
-      });
-    };
   };
 
     // Restaurar estado si hay una canción guardada
@@ -161,7 +96,6 @@ const setupButtons = () => {
       setupAudioEvents();
       Audio.preload = 'metadatos';
       setupButtons();
-      
       
       // Restaurar estado
       const { currentSongId } = playerStore.getState();
