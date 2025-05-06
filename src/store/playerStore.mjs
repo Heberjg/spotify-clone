@@ -7,7 +7,9 @@ let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) ||
       currentSongData: null,
       buffering: {
         buffered: 0,           // Tiempo en segundos bufferizado
-        percentage: 0,         // Porcentaje cargado (0-100)   // Si está cargando actualmente
+        percentage: 0,         // Porcentaje cargado (0-100)
+        isBuffering: false,    // Si está cargando actualmente
+        lastUpdated: null      // Timestamp de última actualización
       }
     }
   
@@ -65,7 +67,26 @@ export const playerStore = {
         // Configuración del audio
         audioElement.src = song.Audio;
         audioElement.dataset.id = songId;
-        audioElement.preload = 'metadatos';
+        audioElement.preload = 'auto';
+      
+      // Precargar el audio antes de cualquier cambio de estado
+      await new Promise((resolve, reject) => {
+        const handleLoaded = () => {
+          audioElement.removeEventListener('canplaythrough', handleLoaded);
+          audioElement.removeEventListener('error', handleError);
+          resolve();
+        };
+        
+        const handleError = (err) => {
+          audioElement.removeEventListener('canplaythrough', handleLoaded);
+          audioElement.removeEventListener('error', handleError);
+          reject(err);
+        };
+        
+        audioElement.addEventListener('canplaythrough', handleLoaded);
+        audioElement.addEventListener('error', handleError);
+        audioElement.load();
+      });
   
       // Actualizar estado y reproducir
       await playerStore.setState({
@@ -81,10 +102,12 @@ export const playerStore = {
         buffering: {
           buffered: 0,
           percentage: 0,
+          isBuffering: true,
+          lastUpdated: Date.now()
         }
       });
   
-      audioElement.play();
+      await audioElement.play();
   
     } catch (error) {
       console.error("Error en playSong:", error);
@@ -94,6 +117,8 @@ export const playerStore = {
         buffering: {
           buffered: 0,
           percentage: 0,
+          isBuffering: false,
+          lastUpdated: Date.now()
         }
       });
       throw error; // Opcional: re-lanzar el error para manejo externo

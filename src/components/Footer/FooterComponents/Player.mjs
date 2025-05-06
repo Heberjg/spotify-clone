@@ -40,7 +40,7 @@ const setupButtons = () => {
       });
     });
   };
-
+  
   // Actualización del botón de play/pause
   const updatePlayButton = () => {
     const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
