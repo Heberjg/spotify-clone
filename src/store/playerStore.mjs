@@ -1,19 +1,18 @@
 
-let currentState = typeof sessionStorage !== 'undefined' 
-  ? JSON.parse(sessionStorage.getItem('music-player-storage')) || {
+let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) || {
       currentSongId: null,
       isPlaying: false,
       currentLocation: null,
       currentAudio: null,
       currentSongData: null,
+      buffering: {
+        buffered: 0,           // Tiempo en segundos bufferizado
+        percentage: 0,         // Porcentaje cargado (0-100)
+        isBuffering: false,    // Si está cargando actualmente
+        lastUpdated: null      // Timestamp de última actualización
+      }
     }
-  : {
-      currentSongId: null,
-      isPlaying: false,
-      currentLocation: null,
-      currentAudio: null,
-      currentSongData: null,
-    };
+  
 
 import { songs } from "../assets/Songs.mjs"
 
@@ -41,74 +40,102 @@ export const playerStore = {
   },
   
   playSong: async (songId, location) => {
-    const { currentSongId, isPlaying, currentAudio, currentLocation } = currentState;
-    const song = songs.find(s => s.id === songId);
-    if (!song?.Audio) return;
-
-    const isSameSong = currentSongId === songId;
-    const isSameLocation = currentLocation === location
+    try {
+      const { currentSongId, isPlaying, currentAudio, currentLocation } = currentState;
+      const song = songs.find(s => s.id === songId);
+      const isSameSong = currentSongId === songId;
+      const isSameLocation = currentLocation === location
+      
+      // Validación inicial
+      if (!song?.Audio) throw new Error('Canción no disponible');
   
-    if (isSameSong && isSameLocation) {
-      try {
+      // Caso 1: Misma canción y misma ubicación (toggle play/pause)
+      if (isSameLocation && isSameSong) {
         if (isPlaying) {
-          currentAudio.pause();
+          await currentAudio.pause();
           playerStore.setState({ isPlaying: false });
         } else {
           await currentAudio.play();
           playerStore.setState({ isPlaying: true });
         }
-        // updatePlayButton();
-        return;
-      } catch (error) {
-        console.error("Error al toggle play/pause:", error);
         return;
       }
-    }
-    //  Caso 2: Misma canción diferente ubicación o canción nueva
-    
-  try {
-    // Pausar y resetear si hay algo reproduciéndose
-    if (currentAudio && isPlaying) {
-      currentAudio.pause();
-    } 
-      // Configurar nueva canción
-      currentAudio.src = song.Audio;
-      currentAudio.dataset.id = songId;
   
-      // Reproducir
-      await playerStore.setState({ 
+      // Caso 2: Nueva canción o diferente ubicación
+        const audioElement = currentAudio || new Audio();
+        
+        // Configuración del audio
+        audioElement.src = song.Audio;
+        audioElement.dataset.id = songId;
+        audioElement.preload = 'auto';
+      
+      // Precargar el audio antes de cualquier cambio de estado
+      await new Promise((resolve, reject) => {
+        const handleLoaded = () => {
+          audioElement.removeEventListener('canplaythrough', handleLoaded);
+          audioElement.removeEventListener('error', handleError);
+          resolve();
+        };
+        
+        const handleError = (err) => {
+          audioElement.removeEventListener('canplaythrough', handleLoaded);
+          audioElement.removeEventListener('error', handleError);
+          reject(err);
+        };
+        
+        audioElement.addEventListener('canplaythrough', handleLoaded);
+        audioElement.addEventListener('error', handleError);
+        audioElement.load();
+      });
+  
+      // Actualizar estado y reproducir
+      playerStore.setState({
         currentSongId: songId,
-        currentSongData: { 
+        currentSongData: {
           name: song.Name,
           artist: song.Artist,
-          image: song.img,
+          image: song.img
         },
         isPlaying: true,
         currentLocation: location,
-        currentAudio
+        currentAudio: audioElement,
+        buffering: {
+          buffered: 0,
+          percentage: 0,
+          isBuffering: true,
+          lastUpdated: Date.now()
+        }
       });
-      currentAudio.play();
-
-  } catch (error) {
-    console.error("Error al reproducir:", error);
-    playerStore.setState({ isPlaying: false });
-  }
   
+      await audioElement.play();
+  
+    } catch (error) {
+      console.error("Error en playSong:", error);
+      playerStore.setState({ 
+        isPlaying: false,
+        currentAudio: null,
+        buffering: {
+          buffered: 0,
+          percentage: 0,
+          isBuffering: false,
+          lastUpdated: Date.now()
+        }
+      });
+      throw error; // Opcional: re-lanzar el error para manejo externo
+    }
   },
   
 
   // Change stated of the button from pause to play and backwards
-  togglePlay: () => {
-    const { isPlaying, currentAudio } = currentState;
-    if (!currentAudio) return;
-    
+  togglePlay: async () => {
+    const { isPlaying, currentAudio} = currentState;
+    // Control normal de play/pause
     if (isPlaying) {
-      currentAudio.pause();
+      await currentAudio.pause();
       playerStore.setState({ isPlaying: false });
     } else {
-      currentAudio.play()
-        .then(() => playerStore.setState({ isPlaying: true }))
-        .catch(e => console.error("Error al reproducir:", e));
+      await currentAudio.play();
+      playerStore.setState({ isPlaying: true });
     }
   }
 };

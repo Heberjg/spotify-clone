@@ -1,6 +1,6 @@
 // Botones de canciones del MAIN
 import { playerStore } from "../../../store/playerStore.mjs";
-
+import { handleSongChange } from "../FooterComponents/Player.mjs";
 export const mainbutton = () => {
 
 const updateMainButtons = () => {
@@ -26,12 +26,15 @@ const updateMainButtons = () => {
 const unsubscribe = playerStore.subscribe(updateMainButtons);
 
 // Configurar listeners iniciales
+let lastClick = 0;
 document.querySelectorAll(".Play-button").forEach(button => {
-  button.addEventListener("click", () => {
-    const songId = button.getAttribute("data-id");
-    playerStore.playSong(songId, 'main');
-  });
-});
+  button.addEventListener("click", async () => {
+    const now = Date.now();
+        if (now - lastClick < 500) return; // Throttle de 500ms
+        lastClick = now;
+        handleSongChange(button, "main").catch(console.error);
+      });
+    });
 
 // Actualización inicial
 updateMainButtons();

@@ -2,27 +2,41 @@
 import { songs } from "../../../assets/Songs.mjs";
 import { playerStore } from "../../../store/playerStore.mjs";
 
+export const handleSongChange = async (button, location) => {
+  const songId = button.getAttribute("data-id");
+  await playerStore.playSong(songId, location);
+};
+
 export async function Player() {
   const AudioPlayButton = document.getElementById("Audio-Play");
   const Audio = document.getElementById("Audio");
-
+  
+  
   // Función para manejar play/pause en todos los butones
 const setupButtons = () => {
-    // Botón principal de play/pause
-    AudioPlayButton?.addEventListener("click", () => {
-      const { currentSongId } = playerStore.getState();
-      if (!currentSongId && songs.length > 0) {
-        playerStore.playSong(songs[0].id, 'main');
-      } else {
-        playerStore.togglePlay();
+    AudioPlayButton?.addEventListener("click", async () => {
+      const { currentSongId } = playerStore.getState()
+      try {
+        if (!currentSongId && songs.length > 0) {
+          // Si no hay canción seleccionada, reproducir la primera
+          await playerStore.playSong(songs[0].id, 'main');
+        } else {
+          // Si hay canción seleccionada, usar togglePlay
+          await playerStore.togglePlay();
+        }
+      } catch (error) {
+        console.error("Error al reproducir:", error);
       }
     });
 
     // Botones del SIDEBAR
+    let lastClick = 0;
     document.querySelectorAll(".Song-button-aside").forEach(button => {
       button.addEventListener("click", () => {
-        const songId = button.getAttribute("data-id");
-        playerStore.playSong(songId, 'sidebar');
+        const now = Date.now();
+        if (now - lastClick < 300) return; // Throttle de 500ms
+        lastClick = now;
+        handleSongChange(button, "sidebar").catch(console.error);
       });
     });
   };
@@ -44,7 +58,7 @@ const setupButtons = () => {
 
     
 
-  // 3. Actualizar botones del SIDEBAR (independientes)
+  // Actualizar botones del SIDEBAR (independientes)
   const sidebarButtons = document.querySelectorAll(".Song-button-aside");
   sidebarButtons.forEach((button) => {
     const songId = button.getAttribute("data-id");
@@ -67,8 +81,7 @@ const setupButtons = () => {
   const setupAudioEvents = () => {
     if (!Audio) return;
 
-    Audio.preload = 'metadata';
-    
+
     ['play', 'pause', 'ended'].forEach(event => {
       Audio.addEventListener(event, () => {
         playerStore.setState({ 
@@ -77,38 +90,85 @@ const setupButtons = () => {
       });
     });
 
-    Audio.addEventListener('progress', () => {
-      if (Audio.buffered.length > 0) {
-        playerStore.setState({ buffered: Audio.buffered.end(0) });
+    const handleProgress = () => {
+      if (!Audio?.buffered.length || Audio.readyState === 0) return;
+      
+      try {
+        const bufferedEnd = Audio.buffered.end(Audio.buffered.length - 1);
+        playerStore.setState({
+          buffering: {
+            buffered: bufferedEnd,
+            percentage: Audio.duration ? (bufferedEnd / Audio.duration) * 100 : 0,
+            isBuffering: Audio.readyState < 3,
+            lastUpdated: Date.now()
+          }
+        });
+      } catch (error) {
+        console.error('Error updating buffering:', error);
+        playerStore.setState({
+          buffering: {
+            ...currentState.buffering,
+            isBuffering: false,
+            lastUpdated: Date.now()
+          }
+        });
       }
-    });
+    };
+  
+    const handleError = () => {
+      playerStore.setState({ isPlaying: false });
+    };
+  
+    // Agregar todos los event listeners
+    Audio.addEventListener('progress', handleProgress);
+    Audio.addEventListener('error', handleError);
+    // [Agrega otros event listeners que necesites]
+  
+    // Retornar función de limpieza
+    return () => {
+      Audio.removeEventListener('progress', handleProgress);
+      Audio.removeEventListener('error', handleError);
+      // [Remover otros event listeners que hayas agregado]
+    };
   };
 
     // Restaurar estado si hay una canción guardada
-    const initialize = () => {
+    const initialize =  async() => {
       playerStore.setState({ currentAudio: Audio });
       setupAudioEvents();
+      Audio.preload = 'auto';
       setupButtons();
       
+      
       // Restaurar estado
-      const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
-      if (currentSongId) {
-        const song = songs.find(s => s.id === currentSongId);
-        if (song?.Audio) {
-          Audio.src = song.Audio;
-          Audio.dataset.id = song.id;
-          if (isPlaying && currentLocation) {
-            Audio.play().catch(e => console.error("Error al reanudar:", e));
+      const { currentSongId } = playerStore.getState();
+      try {
+        if (currentSongId) {
+          const song = songs.find(s => s.id === currentSongId);
+          if (!song?.Audio) throw new Error('Canción no tiene audio');
+          
+          // Solo actualiza el audio si es diferente al actual
+          if (Audio.src !== song.Audio || Audio.dataset.id !== currentSongId) {
+            Audio.src = song.Audio;
+            Audio.dataset.id = song.id;
+            await new Promise((resolve) => {
+              Audio.addEventListener('canplaythrough', resolve, { once: true });
+              Audio.load();
+            });
           }
         }
+      } catch (error) {
+        console.error("Error al inicializar:", error);
+        playerStore.setState({ 
+          isPlaying: false,
+          currentSongId: null
+        });
       }
-      
       updatePlayButton();
       return playerStore.subscribe(updatePlayButton);
     };
   
     const unsubscribe = initialize();
-    
     return () => unsubscribe();
   
 }
