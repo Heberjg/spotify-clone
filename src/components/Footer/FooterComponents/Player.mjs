@@ -81,7 +81,6 @@ const setupButtons = () => {
   const setupAudioEvents = () => {
     if (!Audio) return;
 
-
     ['play', 'pause', 'ended'].forEach(event => {
       Audio.addEventListener(event, () => {
         playerStore.setState({ 
@@ -99,8 +98,6 @@ const setupButtons = () => {
           buffering: {
             buffered: bufferedEnd,
             percentage: Audio.duration ? (bufferedEnd / Audio.duration) * 100 : 0,
-            isBuffering: Audio.readyState < 3,
-            lastUpdated: Date.now()
           }
         });
       } catch (error) {
@@ -108,8 +105,6 @@ const setupButtons = () => {
         playerStore.setState({
           buffering: {
             ...currentState.buffering,
-            isBuffering: false,
-            lastUpdated: Date.now()
           }
         });
       }
@@ -136,7 +131,7 @@ const setupButtons = () => {
     const initialize =  async() => {
       playerStore.setState({ currentAudio: Audio });
       setupAudioEvents();
-      Audio.preload = 'auto';
+      Audio.preload = 'metadatos';
       setupButtons();
       
       
@@ -151,10 +146,6 @@ const setupButtons = () => {
           if (Audio.src !== song.Audio || Audio.dataset.id !== currentSongId) {
             Audio.src = song.Audio;
             Audio.dataset.id = song.id;
-            await new Promise((resolve) => {
-              Audio.addEventListener('canplaythrough', resolve, { once: true });
-              Audio.load();
-            });
           }
         }
       } catch (error) {
@@ -164,7 +155,6 @@ const setupButtons = () => {
           currentSongId: null
         });
       }
-      updatePlayButton();
       return playerStore.subscribe(updatePlayButton);
     };
   

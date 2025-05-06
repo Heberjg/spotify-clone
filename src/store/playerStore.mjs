@@ -7,9 +7,7 @@ let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) ||
       currentSongData: null,
       buffering: {
         buffered: 0,           // Tiempo en segundos bufferizado
-        percentage: 0,         // Porcentaje cargado (0-100)
-        isBuffering: false,    // Si está cargando actualmente
-        lastUpdated: null      // Timestamp de última actualización
+        percentage: 0,         // Porcentaje cargado (0-100)   // Si está cargando actualmente
       }
     }
   
@@ -67,29 +65,10 @@ export const playerStore = {
         // Configuración del audio
         audioElement.src = song.Audio;
         audioElement.dataset.id = songId;
-        audioElement.preload = 'auto';
-      
-      // Precargar el audio antes de cualquier cambio de estado
-      await new Promise((resolve, reject) => {
-        const handleLoaded = () => {
-          audioElement.removeEventListener('canplaythrough', handleLoaded);
-          audioElement.removeEventListener('error', handleError);
-          resolve();
-        };
-        
-        const handleError = (err) => {
-          audioElement.removeEventListener('canplaythrough', handleLoaded);
-          audioElement.removeEventListener('error', handleError);
-          reject(err);
-        };
-        
-        audioElement.addEventListener('canplaythrough', handleLoaded);
-        audioElement.addEventListener('error', handleError);
-        audioElement.load();
-      });
+        audioElement.preload = 'metadatos';
   
       // Actualizar estado y reproducir
-      playerStore.setState({
+      await playerStore.setState({
         currentSongId: songId,
         currentSongData: {
           name: song.Name,
@@ -102,12 +81,10 @@ export const playerStore = {
         buffering: {
           buffered: 0,
           percentage: 0,
-          isBuffering: true,
-          lastUpdated: Date.now()
         }
       });
   
-      await audioElement.play();
+      audioElement.play();
   
     } catch (error) {
       console.error("Error en playSong:", error);
@@ -117,8 +94,6 @@ export const playerStore = {
         buffering: {
           buffered: 0,
           percentage: 0,
-          isBuffering: false,
-          lastUpdated: Date.now()
         }
       });
       throw error; // Opcional: re-lanzar el error para manejo externo
