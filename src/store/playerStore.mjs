@@ -66,7 +66,7 @@ export const playerStore = {
         // Configuración del audio
         audioElement.src = song.Audio;
         audioElement.dataset.id = songId;
-        audioElement.preload = 'auto';
+        audioElement.preload = 'none';
 
         playerStore.setState({
           currentSongData: {
