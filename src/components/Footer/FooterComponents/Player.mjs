@@ -80,50 +80,78 @@ const setupButtons = () => {
   // Eventos del reproductor
   const setupAudioEvents = () => {
     if (!Audio) return;
-
-    ['play', 'pause', 'ended'].forEach(event => {
-      Audio.addEventListener(event, () => {
-        playerStore.setState({ 
-          isPlaying: event === 'play' 
-        });
-      });
-    });
-
-    const handleProgress = () => {
-      if (!Audio?.buffered.length || Audio.readyState === 0) return;
+  
+    // 1. Manejadores básicos
+    const handlePlay = () => playerStore.setState({ isPlaying: true });
+    const handlePause = () => playerStore.setState({ isPlaying: false });
+    const handleEnded = () => playerStore.setState({ isPlaying: false });
+  
+    // 2. Sistema avanzado de buffering
+    const updateBufferState = () => {
+      if (!Audio.buffered.length) return;
       
-      try {
-        const bufferedEnd = Audio.buffered.end(Audio.buffered.length - 1);
-        playerStore.setState({
-          buffering: {
-            buffered: bufferedEnd,
-            percentage: Audio.duration ? (bufferedEnd / Audio.duration) * 100 : 0,
-          }
-        });
-      } catch (error) {
-        console.error('Error updating buffering:', error);
-        playerStore.setState({
-          buffering: {
-            ...currentState.buffering,
-          }
-        });
-      }
+      const bufferedEnd = Audio.buffered.end(Audio.buffered.length - 1);
+      const percentage = Audio.duration ? (bufferedEnd / Audio.duration) * 100 : 0;
+      
+      playerStore.setState({
+        buffering: {
+          buffered: bufferedEnd,
+          percentage,
+          isBuffering: false
+        }
+      });
     };
   
-    const handleError = () => {
-      playerStore.setState({ isPlaying: false });
+    const handleWaiting = () => {
+      playerStore.setState({
+        buffering: {
+          ...currentState.buffering,
+          isBuffering: true
+        }
+      });
+      
+      // Inteligencia para reanudar automáticamente
+      const checkBufferAndPlay = () => {
+        if (Audio.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
+          Audio.play().catch(e => console.log("Reanudación automática:", e));
+        } else {
+          setTimeout(checkBufferAndPlay, 500);
+        }
+      };
+      checkBufferAndPlay();
     };
   
-    // Agregar todos los event listeners
-    Audio.addEventListener('progress', handleProgress);
-    Audio.addEventListener('error', handleError);
-    // [Agrega otros event listeners que necesites]
+    // 3. Configurar todos los listeners
+    const events = {
+      play: handlePlay,
+      pause: handlePause,
+      ended: handleEnded,
+      progress: updateBufferState,
+      waiting: handleWaiting,
+      canplay: () => playerStore.setState({
+        buffering: {
+          isBuffering: false
+        }
+      }),
+      error: () => playerStore.setState({ 
+        isPlaying: false,
+        buffering: {
+          isBuffering: false,
+          percentage: 0,
+          buffered: 0
+        }
+      })
+    };
   
-    // Retornar función de limpieza
+    Object.entries(events).forEach(([event, handler]) => {
+      Audio.addEventListener(event, handler);
+    });
+  
+    // 4. Función de limpieza
     return () => {
-      Audio.removeEventListener('progress', handleProgress);
-      Audio.removeEventListener('error', handleError);
-      // [Remover otros event listeners que hayas agregado]
+      Object.entries(events).forEach(([event, handler]) => {
+        Audio.removeEventListener(event, handler);
+      });
     };
   };
 

@@ -9,7 +9,6 @@ let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) ||
         buffered: 0,           // Tiempo en segundos bufferizado
         percentage: 0,         // Porcentaje cargado (0-100)
         isBuffering: false,    // Si está cargando actualmente
-        lastUpdated: null      // Timestamp de última actualización
       }
     }
   
@@ -68,46 +67,49 @@ export const playerStore = {
         audioElement.src = song.Audio;
         audioElement.dataset.id = songId;
         audioElement.preload = 'auto';
-      
+
+        playerStore.setState({
+          currentSongData: {
+            name: song.Name,
+            artist: song.Artist,
+            image: song.img
+          },
+        })
       // Precargar el audio antes de cualquier cambio de estado
-      await new Promise((resolve, reject) => {
-        const handleLoaded = () => {
-          audioElement.removeEventListener('canplaythrough', handleLoaded);
-          audioElement.removeEventListener('error', handleError);
-          resolve();
-        };
-        
-        const handleError = (err) => {
-          audioElement.removeEventListener('canplaythrough', handleLoaded);
-          audioElement.removeEventListener('error', handleError);
-          reject(err);
-        };
-        
-        audioElement.addEventListener('canplaythrough', handleLoaded);
-        audioElement.addEventListener('error', handleError);
-        audioElement.load();
-      });
+      
   
       // Actualizar estado y reproducir
       await playerStore.setState({
         currentSongId: songId,
-        currentSongData: {
-          name: song.Name,
-          artist: song.Artist,
-          image: song.img
-        },
-        isPlaying: true,
+        isPlaying: false,
         currentLocation: location,
         currentAudio: audioElement,
         buffering: {
           buffered: 0,
           percentage: 0,
           isBuffering: true,
-          lastUpdated: Date.now()
         }
       });
   
+      // Iniciar carga (la reproducción la controlará setupAudioEvents)
+      // Esperar a que haya metadata disponible
+    await new Promise((resolve) => {
+      audioElement.addEventListener('loadedmetadata', resolve, { once: true });
+      audioElement.load();
+    });
+
+    // Intentar reproducción inmediata si hay suficiente buffer
+    if (audioElement.readyState >= HTMLMediaElement.HAVE_FUTURE_DATA) {
       await audioElement.play();
+      playerStore.setState({ isPlaying: true });
+    } else {
+      // Si no hay suficiente buffer, setupAudioEvents manejará la reproducción después
+      audioElement.addEventListener('canplay', () => {
+        if (currentState.currentSongId === songId && !currentState.isPlaying) {
+          audioElement.play().catch(e => console.log("Auto-play prevented:", e));
+        }
+      }, { once: true });
+    }
   
     } catch (error) {
       console.error("Error en playSong:", error);
