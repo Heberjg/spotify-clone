@@ -66,7 +66,9 @@ export const playerStore = {
         // Configuración del audio
         audioElement.src = song.Audio;
         audioElement.dataset.id = songId;
-        audioElement.preload = 'auto';
+        audioElement.preload = 'none';
+        audioElement.onprogress = null;
+        audioElement.onwaiting = null;
 
         playerStore.setState({
           currentSongData: {
@@ -75,12 +77,12 @@ export const playerStore = {
             image: song.img
           },
         })
+        
       // Precargar el audio antes de cualquier cambio de estado
       audioElement.onprogress = () => {
         if (audioElement.buffered.length > 0) {
           const bufferedEnd = audioElement.buffered.end(audioElement.buffered.length - 1);
           const percent = (bufferedEnd / audioElement.duration) * 100;
-          console.log(percent)
           playerStore.setState({
             buffering: {
               buffered: bufferedEnd,
@@ -88,10 +90,6 @@ export const playerStore = {
               isBuffering: false
             }
           });
-  
-          if (percent > 20 && audioElement.paused) {
-            audioElement.play().catch(e => console.log("Auto-play:", e));
-          }
         }
       };
   
@@ -100,15 +98,17 @@ export const playerStore = {
           buffering: {
             ...currentState.buffering,
             isBuffering: true
-          }
+          },
         });
       };
   
       // 2. Precargar metadata (sin esperar buffer completo)
-      await new Promise((resolve) => {
-        audioElement.addEventListener('loadedmetadata', resolve, { once: true });
-        audioElement.load(); // Inicia la carga
-      });
+  
+      await audioElement.addEventListener('loadedmetadata', () => {
+        console.log("Metadatos cargados");
+      }, { once: true });
+
+      
   
       // 3. Actualizar estado y reproducir
       playerStore.setState({
@@ -122,12 +122,11 @@ export const playerStore = {
           isBuffering: true
         }
       });
-  
-      // 4. Reproducir (se auto-pausará si no hay buffer suficiente)
+      
       await audioElement.play().catch(e => {
-        console.log("Esperando buffer...");
-        // El evento 'waiting' manejará el estado
+        console.log("Esperando buffer..., e");
       });
+      console.log(audioElement)
   
     } catch (error) {
       console.error("Error en playSong:", error);

@@ -34,7 +34,7 @@ const setupButtons = () => {
     document.querySelectorAll(".Song-button-aside").forEach(button => {
       button.addEventListener("click", () => {
         const now = Date.now();
-        if (now - lastClick < 300) return; // Throttle de 500ms
+        if (now - lastClick < 500) return; // Throttle de 500ms
         lastClick = now;
         handleSongChange(button, "sidebar").catch(console.error);
       });
@@ -88,6 +88,26 @@ const setupButtons = () => {
         });
       });
     });
+
+    // Audio.addEventListener('progress', () => {
+    //   if (Audio.buffered.length > 0) {
+    //     const bufferedEnd = Audio.buffered.end(Audio.buffered.length - 1);
+    //     const bufferedPercent = (bufferedEnd / Audio.duration) * 100;
+    //     console.log(`Buffer: ${bufferedPercent.toFixed(1)}% cargado`);
+        
+    //     // Auto-play cuando tengamos 20% de buffer
+    //     if (bufferedPercent > 20 && !Audio.paused) {
+    //       Audio.play().catch(e => console.log(e));
+    //     }
+    //   }
+    // });
+    
+    // Audio.addEventListener('waiting', () => {
+    //   console.log("Esperando por más datos...");
+    // });
+    
+    // Audio.load(); // Inicia la carga
+    
   };
 
     // Restaurar estado si hay una canción guardada
@@ -97,7 +117,7 @@ const setupButtons = () => {
       setupButtons();
       
       // Restaurar estado
-      const { currentSongId, currentLocation } = playerStore.getState();
+      const { currentSongId } = playerStore.getState();
       try {
         if (currentSongId) {
           const song = songs.find(s => s.id === currentSongId);
