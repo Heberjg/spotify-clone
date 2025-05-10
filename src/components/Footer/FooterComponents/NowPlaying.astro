@@ -29,37 +29,31 @@ import placeholderImage from "../../../assets/background.svg";
   const imageSource = document.getElementById('dynamic-image-source') as HTMLImageElement;
   const songTitle = document.getElementById('song-title');
   const songArtist = document.getElementById('song-artist');
-  
-  let currentImageUrl = '';
-  
-  const unsubscribe = playerStore.subscribe((state) => {
-    const { currentSongData } = state || {};
-    const newImageUrl = currentSongData?.image?.src || '';
-    
-    if (newImageUrl !== currentImageUrl) {
-      currentImageUrl = newImageUrl;
-      
-      const loader = new Image();
-      loader.src = newImageUrl;
-      
-      loader.onload = () => {
-        imageSource.srcset = newImageUrl;
-        songImage.src = newImageUrl;
-        songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
-      };
-      
-      loader.onerror = () => {
-        songImage.src = placeholderImage.src;
-      };
-    }
-    
-    if (currentSongData) {
-      songTitle.textContent = currentSongData.name || '';
-      songArtist.textContent = currentSongData.artist || '';
-    }
-  });
 
-  window.addEventListener('beforeunload', unsubscribe);
+  const ImageUpdate = () => {
+  const { currentSongData, currentSongId } = playerStore.getState();
+  
+  // Si no hay datos de canción o no hay ID de canción, establecer valores por defecto
+  if (!currentSongData || !currentSongId) {
+    // Establecer imagen por defecto (puedes usar una imagen placeholder o cadena vacía)
+    imageSource.srcset = placeholderImage.src; 
+    songImage.alt = 'Selecciona una canción';
+  
+    return; // Salir de la función temprano
+  }
+
+  if (currentSongData.image.src !==  imageSource.srcset) {
+    const newImageUrl = currentSongData?.image?.src || '';
+  imageSource.srcset = newImageUrl;
+  songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
+
+  if (currentSongData) {
+    songTitle.textContent = currentSongData.name || '';
+    songArtist.textContent = currentSongData.artist || '';
+  }
+  }
+};
+  playerStore.subscribe(ImageUpdate)
 </script>
 
 

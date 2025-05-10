@@ -8,8 +8,8 @@ import Repetir from "./FooterIcons/Repetir.astro"
 import NowPlaying from "./FooterComponents/NowPlaying.astro"
 ---
 
-<footer class="flex justify-between h-18 place-items-center"   transition:persist="Footer-state">
-  <div id="Container-Listening-Song" class="flex w-50 ml-2">
+<footer class="flex justify-between h-18 place-items-center px-2"   transition:persist="Footer-state">
+  <div id="Container-Listening-Song" class="flex w-50">
     <NowPlaying />
   </div>
   <div id="Container-Controls-Audio" class="flex flex-col gap-3 place-items-center">
@@ -40,19 +40,38 @@ import NowPlaying from "./FooterComponents/NowPlaying.astro"
         </span>
       </button>
     </div>
-    <div id="Audio-Bar-Duration" class="flex">
+    <div id="Audio-Bar-Duration" class="flex place-items-center gap-2">
       <span id="Current-Song-Duration" class="text-sm">10</span>
-      <div id="Bar-Song-Duration"></div>
+      <div id="Bar-Song-Duration">
+        <label for="" class="hidden-visually"> Duracion de la barra
+          <input type="range" min="0" max="1" step="0.01" value="">
+        </label>  
+        <div id="Range-Duration" data-="volume-bar">
+          <div class="track-Duration">
+            <div class="progress-Duration" style="--progress: 0%;"></div>
+          </div>
+        </div>
+      </div>
       <span id="Song-Duration" class="text-sm">10</span>
     </div>
     <audio src="" id="Audio" ></audio>
   </div>
-  <div id="Container-Features-Audio">
+  <div id="Container-Features-Audio" class="flex place-items-center justify-end" >
     <button id="Audio-Volumen" class="Audio-Button">
       <span class="Audio-Button-Icon">
         <Volumen />
       </span>
     </button>
+    <div id="Container-Range" >
+      <label for="" class="hidden-visually"> Control de volumen
+        <input type="range" min="0" max="1" step="0.01" value="">
+      </label>
+      <div id="Range-Volumen" data-="volume-bar">
+        <div class="track">
+          <div class="progress" style="--progress: 70%;"></div>
+        </div>
+      </div>
+    </div>
   </div>
   
 </footer>
@@ -60,13 +79,110 @@ import NowPlaying from "./FooterComponents/NowPlaying.astro"
 <script>
   import { Player } from "../Footer/FooterComponents/Player.mjs"
   Player()
+
 </script>
 
 <style>
+  #Container-Features-Audio {
+    width: 200px;
+  }
+  #Container-Range {
+    width: 100px;
+    height: 12px;
+  }
+
+  #Bar-Song-Duration {
+    height: 12px;
+    width: 400px;
+  }
+
+  #Range-Volumen, #Range-Duration{
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .track-Duration {
+    position: relative;
+    height: 4px;
+    background: #535353;
+    border-radius: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .progress-Duration {
+    position: absolute;
+    height: 100%;
+    background: #1db954;
+    border-radius: 2px;
+    width: var(--progress);
+  }
+
+  .progress-Duration::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity .1s ease-in-out;
+  }
+
+  .track {
+    position: relative;
+    height: 4px;
+    background: #535353;
+    border-radius: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .progress {
+    position: absolute;
+    height: 100%;
+    background: #1db954;
+    border-radius: 2px;
+    width: var(--progress);
+  }
+
+  .progress::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity .1s ease-in-out;
+  }
+
+  #Container-Range:hover .progress::after, #Range-Duration:hover .progress-Duration::after {
+  opacity: 1;
+}
+  
   footer {
     grid-area: ft;
     background-color: #10101044;
   }
+
+  .hidden-visually {
+  border: 0;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  clip: rect(0 0 0 0);
+}
+
   .Audio-Button {
     padding: 0.6em;
     margin: 0;

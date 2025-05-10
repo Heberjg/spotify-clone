@@ -1,11 +1,13 @@
 // Botones de canciones del MAIN
 import { playerStore } from "../../../store/playerStore.mjs";
 import { handleSongChange } from "../FooterComponents/Player.mjs";
-export const mainbutton = () => {
+const { isPlaying } = playerStore.getState()
 
-const updateMainButtons = () => {
+
+export const mainbutton = () => {
+  const updateMainButtons = () => {
   const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
-  
+  if (currentLocation !== "main") return;
   document.querySelectorAll(".Play-button").forEach((button) => {
     const songId = button.getAttribute("data-id");
     const isCurrentSong = currentSongId === songId;
@@ -24,7 +26,6 @@ const updateMainButtons = () => {
 
 // Suscribirse a cambios en el store
 const unsubscribe = playerStore.subscribe(updateMainButtons);
-
 // Configurar listeners iniciales
 let lastClick = 0;
 document.querySelectorAll(".Play-button").forEach(button => {
@@ -36,14 +37,14 @@ document.querySelectorAll(".Play-button").forEach(button => {
       });
     });
 
-// Actualización inicial
-updateMainButtons();
-
 // Retornar función de limpieza
-return () => {
-  unsubscribe();
-  document.querySelectorAll(".Play-button").forEach(button => {
-    button.replaceWith(button.cloneNode(true)); // Limpia todos los listeners
-  });
-};
+  return () => {
+    unsubscribe();
+    document.querySelectorAll(".Play-button").forEach(button => {
+      button.replaceWith(button.cloneNode(true)); // Limpia todos los listeners
+    });
+  };
 }
+
+
+  
