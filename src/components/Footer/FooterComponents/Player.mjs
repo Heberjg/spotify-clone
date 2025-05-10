@@ -15,13 +15,13 @@ export const updateButtonUI = (button, isActive) => {
   
   iconPath.setAttribute("d", isActive ? ICONS.PAUSE : ICONS.PLAY);
   button.setAttribute("aria-label", isActive ? "Pausar" : "Reproducir");
-  console.log("updateButton")
+
 };
 
 export const handleSongChange = async (button, location) => {
   const songId = button.getAttribute("data-id");
   await playerStore.playSong(songId, location);
-  console.log("handleSong")
+
   
 };
 
@@ -32,7 +32,7 @@ export const setupButtonListener = (button, location) => {
     if (now - lastClick < 500) return;
     lastClick = now;
     await handleSongChange(button, location);
-    console.log("setuppbuttonlistener")
+    
   });
 };
 
@@ -46,9 +46,9 @@ export const initMainButtons = () => {
   // Configurar listeners una sola vez
   document.querySelectorAll(".Play-button").forEach(button => {
     setupButtonListener(button, "main");
-    console.log("a")
+
   });
-  console.log("initmainbuttons")
+ 
   // Actualizar estado inicial
   Init = true
   updatePlayButton();
@@ -57,7 +57,7 @@ export const initMainButtons = () => {
 // Actualización del botón de play/pause
   const updatePlayButton = () => {
     const AudioPlayButton = document.getElementById("Audio-Play");
-    console.log("updatePlay")
+    
     const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
     //Boton principal)
     if (AudioPlayButton) {
@@ -91,7 +91,7 @@ export const initMainButtons = () => {
 export async function Player() {
   const AudioPlayButton = document.getElementById("Audio-Play");
   const Audio = document.getElementById("Audio");
-  console.log("Player")
+
   
   // Función para manejar play/pause en todos los butones
 const setupButtons = () => {
@@ -110,7 +110,6 @@ const setupButtons = () => {
       }
     });
 
-    console.log("SetupButtons")
 
     // Botones del SIDEBAR
     document.querySelectorAll(".Song-button-aside").forEach(button => {
@@ -129,7 +128,6 @@ const setupButtons = () => {
         playerStore.setState({ 
           isPlaying: event === 'play' 
         });
-        console.log("SetupAudioEvents")
         updatePlayButton()
       });
     });
@@ -140,7 +138,6 @@ const setupButtons = () => {
     const { volumen } = playerStore.getState();  
     const slider = document.getElementById('Container-Range');
     const input = document.querySelector('input[type="range"]');
-    console.log("VolumenSet")
     if (!slider || !input || !Audio) {
       console.error('Elementos esenciales no encontrados');
       return;

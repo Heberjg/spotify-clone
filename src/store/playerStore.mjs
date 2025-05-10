@@ -117,26 +117,27 @@ export const playerStore = {
           buffering: {
             ...currentState.buffering,
             isBuffering: true
-          },
-          
+          }, 
         });
       };
   
       await audioElement.addEventListener('loadedmetadata', () => {
         console.log("Metadatos cargados");
-          
+          playerStore.setState({duration: audioElement.duration, currentAudio: audioElement})
       }, { once: true });
 
        playerStore.setState({
           currentLocation: location,
-          currentAudio: audioElement,
           isPlaying: true,
-          
-          duration: audioElement.duration,
           currentSongId: songId,
+          buffering: {
+        buffered: 0,          
+        percentage: 0,        
+        isBuffering: true,    
+      },
         })
       
-      console.log("holaaaa")
+      console.log(playerStore.getState())
 
       await audioElement.play()
   
