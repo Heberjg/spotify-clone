@@ -32,7 +32,6 @@ import placeholderImage from "../../../assets/background.svg";
 
   const ImageUpdate = () => {
   const { currentSongData, currentSongId } = playerStore.getState();
-  
   // Si no hay datos de canción o no hay ID de canción, establecer valores por defecto
   if (!currentSongData || !currentSongId) {
     // Establecer imagen por defecto (puedes usar una imagen placeholder o cadena vacía)

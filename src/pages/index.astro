@@ -85,15 +85,15 @@ const randomSongs = shuffledSongs.slice(0, 4);
 
 <script>
     import { LinkClick } from "../components/LinkClick.mjs";
-    import { mainbutton } from "../components/Footer/FooterComponents/Mainbuttons.mjs";
-    let cleanupMainButtons;
+    import {initMainButtons} from "../components/Footer/FooterComponents/Player.mjs"
+    let cleanupMainButtons = null;
 
 const initialize = () => {
     LinkClick();
     cleanupMainButtons?.();
   // Configurar botones y guardar función de limpieza
   
-  cleanupMainButtons = mainbutton();
+  cleanupMainButtons = initMainButtons();
 };
 
 document.addEventListener("DOMContentLoaded", initialize);

@@ -2,16 +2,96 @@
 import { songs } from "../../../assets/Songs.mjs";
 import { playerStore } from "../../../store/playerStore.mjs";
 
+export const ICONS = {
+  PLAY: "M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z",
+  PAUSE: "M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"
+};
+
+
+
+export const updateButtonUI = (button, isActive) => {
+  const iconPath = button.querySelector("svg > path");
+  if (!iconPath) return;
+  
+  iconPath.setAttribute("d", isActive ? ICONS.PAUSE : ICONS.PLAY);
+  button.setAttribute("aria-label", isActive ? "Pausar" : "Reproducir");
+  console.log("updateButton")
+};
+
 export const handleSongChange = async (button, location) => {
   const songId = button.getAttribute("data-id");
   await playerStore.playSong(songId, location);
+  console.log("handleSong")
   
+};
+
+export const setupButtonListener = (button, location) => {
+  let lastClick = 0;
+  button.addEventListener("click", async () => {
+    const now = Date.now();
+    if (now - lastClick < 500) return;
+    lastClick = now;
+    await handleSongChange(button, location);
+    console.log("setuppbuttonlistener")
+  });
+};
+
+let Init = false
+export const initMainButtons = () => {
+  if (Init) {
+    updatePlayButton()
+    Init = false
+    return;
+  }
+  // Configurar listeners una sola vez
+  document.querySelectorAll(".Play-button").forEach(button => {
+    setupButtonListener(button, "main");
+    console.log("a")
+  });
+  console.log("initmainbuttons")
+  // Actualizar estado inicial
+  Init = true
+  updatePlayButton();
+};
+
+// Actualización del botón de play/pause
+  const updatePlayButton = () => {
+    const AudioPlayButton = document.getElementById("Audio-Play");
+    console.log("updatePlay")
+    const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
+    //Boton principal)
+    if (AudioPlayButton) {
+      const iconPath = AudioPlayButton.querySelector("span > svg > path");
+      if (iconPath) {
+        iconPath.setAttribute("d", isPlaying ? ICONS.PAUSE : ICONS.PLAY);
+        AudioPlayButton.setAttribute("aria-label", isPlaying ? "Pausar" : "Reproducir");
+      }
+    }
+
+   const allButtons = [...document.querySelectorAll(".Play-button, .Song-button-aside")];
+  
+  allButtons.forEach(button => {
+    const songId = button.getAttribute("data-id");
+    const buttonLocation = button.classList.contains("Play-button") ? "main" : "sidebar";
+    const isActive = currentSongId === songId && isPlaying && currentLocation === buttonLocation;
+    const iconPath = button.querySelector("svg > path");
+    if (!iconPath) return;
+    
+    // Solo actualizar si el estado cambió
+    const currentIcon = iconPath.getAttribute("d");
+    const shouldBeIcon = isActive ? ICONS.PAUSE : ICONS.PLAY;
+    
+    if (currentIcon !== shouldBeIcon) {
+      iconPath.setAttribute("d", shouldBeIcon);
+      button.setAttribute("aria-label", isActive ? "Pausar" : "Reproducir");
+    }
+  });
 };
 
 export async function Player() {
   const AudioPlayButton = document.getElementById("Audio-Play");
   const Audio = document.getElementById("Audio");
-  
+  console.log("Player")
   
   // Función para manejar play/pause en todos los butones
 const setupButtons = () => {
@@ -30,56 +110,15 @@ const setupButtons = () => {
       }
     });
 
+    console.log("SetupButtons")
+
     // Botones del SIDEBAR
-    let lastClick = 0;
     document.querySelectorAll(".Song-button-aside").forEach(button => {
-      button.addEventListener("click", () => {
-        const now = Date.now();
-        if (now - lastClick < 500) return; // Throttle de 500ms
-        lastClick = now;
-        handleSongChange(button, "sidebar").catch(console.error);
-      });
+      setupButtonListener(button, "sidebar");
     });
   };
   
-  // Actualización del botón de play/pause
-  const updatePlayButton = () => {
-    console.log("2")
-    const { currentSongId, isPlaying, currentLocation } = playerStore.getState();
-    //Boton principal)
-    if (AudioPlayButton) {
-      const iconPath = AudioPlayButton.querySelector("span > svg > path");
-      if (iconPath) {
-        iconPath.setAttribute("d", isPlaying ? 
-          "M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z" : 
-          "M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"
-        );
-        AudioPlayButton.setAttribute("aria-label", isPlaying ? "Pausar" : "Reproducir");
-      }
-    }
-
-
-
-    
-
-  // Actualizar botones del SIDEBAR (independientes)
-  const sidebarButtons = document.querySelectorAll(".Song-button-aside");
-  sidebarButtons.forEach((button) => {
-    const songId = button.getAttribute("data-id");
-    const isCurrentSong = currentSongId === songId;
-    const iconPath = button.querySelector("svg > path");
-    
-    if (iconPath) {
-      if (isCurrentSong && isPlaying && currentLocation === 'sidebar') {
-        iconPath.setAttribute("d", "M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z");
-        button.setAttribute("aria-label", "Pausar");
-      } else {
-        iconPath.setAttribute("d", "M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z");
-        button.setAttribute("aria-label", "Reproducir");
-      }
-    }
-  })
-};
+  
 
   // Eventos del reproductor
   const setupAudioEvents = async () => {
@@ -90,7 +129,8 @@ const setupButtons = () => {
         playerStore.setState({ 
           isPlaying: event === 'play' 
         });
-        console.log("Activado")
+        console.log("SetupAudioEvents")
+        updatePlayButton()
       });
     });
   };
@@ -100,7 +140,7 @@ const setupButtons = () => {
     const { volumen } = playerStore.getState();  
     const slider = document.getElementById('Container-Range');
     const input = document.querySelector('input[type="range"]');
-    
+    console.log("VolumenSet")
     if (!slider || !input || !Audio) {
       console.error('Elementos esenciales no encontrados');
       return;
@@ -142,7 +182,7 @@ const setupButtons = () => {
       document.addEventListener('mouseup', () => {
     if (isDragging) {
         isDragging = false;
-        playerStore.setState({ volumen: input.value });
+        playerStore.setState({ volumen: volumeControl})
         }
     });
 
@@ -150,7 +190,7 @@ const setupButtons = () => {
       slider.addEventListener('mouseleave', () => {
           if (isDragging) {
               isDragging = false;
-              playerStore.setState({ volumen: input.value });
+              playerStore.setState({ volumen: volumeControl})
           }
     });
 
@@ -204,113 +244,26 @@ const setupButtons = () => {
       const CurrentSongDuration = document.getElementById("Current-Song-Duration")
       const SongDuration = document.getElementById("Song-Duration")
       const BarSongDuration = document.getElementById("Bar-Song-Duration")
-      const inputDuration = BarSongDuration.querySelector("label > input")
+      const sliderDuration = document.getElementById("Range-Duration")
+      const inputDuration = document.getElementById("Input-bar")
       const progressDuration = document.querySelector(".progress-Duration")
 
       console.log("a")
 
- if (!currentAudio || !duration) return;
 
-  // Función para formatear tiempo (mm:ss)
-  const formatTime = (sec) => {
-    const minutes = Math.floor(sec / 60);
-    const seconds = Math.floor(sec % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-  };
-
-  // Inicializar valores
-  SongDuration.textContent = formatTime(duration);
-  CurrentSongDuration.textContent = formatTime(currentAudio.currentTime);
-  inputDuration.max = duration;
-  inputDuration.value = currentAudio.currentTime;
-
-  // Actualizar barra de progreso visual
-  const updateProgressBar = () => {
-    const progressPercent = (currentAudio.currentTime / duration) * 100;
-    progressDuration.style.width = `${progressPercent}%`;
-    inputDuration.value = currentAudio.currentTime;
-    CurrentSongDuration.textContent = formatTime(currentAudio.currentTime);
-  };
-
-  // Loop de actualización durante reproducción
-  let animationFrameId;
-  const updateProgress = () => {
-    updateProgressBar();
-    if (isPlaying) {
-      animationFrameId = requestAnimationFrame(updateProgress);
-    }
-  };
-
-  // Iniciar/Detener actualización
-  if (isPlaying) {
-    updateProgress();
-  }
-
-  // Eventos de interacción
-  let isDragging = false;
-
-  inputDuration.addEventListener('input', () => {
-    if (!isDragging) {
-      currentAudio.currentTime = inputDuration.value;
-      updateProgressBar();
-    }
-  });
-
-  inputDuration.addEventListener('input', () => {
-    const newTime = parseFloat(inputDuration.value);
-    currentAudio.currentTime = newTime;
-    CurrentSongDuration.textContent = formatTime(newTime);
-    progressDuration.style.width = `${(newTime / duration) * 100}%`;
-    
-    if (!isDragging) {
-      currentAudio.currentTime = newTime;
-      if (isPlaying) {
-        currentAudio.play().catch(e => console.error("Error al reanudar:", e));
-      }
-    }
-  });
-
-  inputDuration.addEventListener('mousedown', () => {
-    isDragging = true;
-    cancelAnimationFrame(animationFrameId);
-  });
-  
-
-  inputDuration.addEventListener('mouseup', () => {
-    isDragging = false;
-    currentAudio.currentTime = parseFloat(inputDuration.value);
-    if (isPlaying) {
-      currentAudio.play().catch(e => console.error("Error al reanudar:", e));
-      updateProgress();
-    }
-  });
-
-  // Limpieza al desmontar (si usas framework)
-  return () => {
-    cancelAnimationFrame(animationFrameId);
-  };
 };
-
-
-  
 
 
     // Restaurar estado si hay una canción guardada
     const initialize =  async() => {
-      const { currentSongId, volumen, isPlaying, currentAudio, Restore} = playerStore.getState();
-      
       playerStore.setState({ 
         currentAudio: Audio,
-
       });
-      
-      // setupAudioEvents()
+      setupAudioEvents()
       setupButtons();
       VolumenSet()
-      VolumenIcon(Audio.volume)
-      
-      
-      
+      console.log("Initialisz")
+      const { currentSongId, volumen, isPlaying, currentAudio} = playerStore.getState();
       // Restaurar estado
   
       try {
@@ -328,8 +281,6 @@ const setupButtons = () => {
             Audio.dataset.id = song.id;
   
           }
-          
-          
         }
       } catch (error) {
         console.error("Error al inicializar:", error);
@@ -338,8 +289,6 @@ const setupButtons = () => {
           currentSongId: null
         });
       }
-      playerStore.subscribe(updatePlayButton);
-      playerStore.subscribe(BarDuration);
     };
     const unsubscribe = initialize();
     return () => unsubscribe();
