@@ -11,11 +11,13 @@ let currentState = JSON.parse(sessionStorage.getItem('music-player-storage')) ||
         percentage: 0,        
         isBuffering: false,    
       },
-      duration: null,
+      duration: 0,
+      currentTime: 0,
     }
   
 
 import { songs } from "../assets/Songs.mjs"
+import { ImageUpdate } from "../components/Footer/FooterComponents/Player.mjs";
 
 const subscribers = new Set();
 
@@ -31,6 +33,8 @@ export const playerStore = {
         currentSongData: currentState.currentSongData,
         volumen: currentState.volumen,
         duration: currentState.duration,
+        currentTime: currentState.currentTime,
+        currentAudio: currentState.currentAudio,
         // isplaying no se guarda para evitar la reproduccion automatica al recargar, solucion simple
       })
     );
@@ -71,7 +75,6 @@ export const playerStore = {
           await currentAudio.pause();
         } else {
           await currentAudio.play();
-
         }
         return;
       }
@@ -94,6 +97,16 @@ export const playerStore = {
             image: song.img
           },
         })
+        ImageUpdate()
+
+       await new Promise((resolve) => {
+          const onLoaded = () => {
+            audioElement.removeEventListener('loadedmetadata', onLoaded);
+            resolve(audioElement.duration);
+          };
+          audioElement.addEventListener('loadedmetadata', onLoaded, { once: false });
+        });
+
         
       // Precargar el audio antes de cualquier cambio de estado
       audioElement.onprogress = () => {
@@ -121,22 +134,19 @@ export const playerStore = {
         });
       };
   
-      await audioElement.addEventListener('loadedmetadata', () => {
-        console.log("Metadatos cargados");
-          playerStore.setState({duration: audioElement.duration, currentAudio: audioElement})
-      }, { once: true });
-
        playerStore.setState({
           currentLocation: location,
+          currentAudio: audioElement,
           isPlaying: true,
+          currentTime: 0,
           currentSongId: songId,
           buffering: {
-        buffered: 0,          
-        percentage: 0,        
-        isBuffering: true,    
-      },
+            buffered: 0,          
+            percentage: 0,        
+            isBuffering: true,   
+            
+          },
         })
-      
       console.log(playerStore.getState())
 
       await audioElement.play()

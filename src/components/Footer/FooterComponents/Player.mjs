@@ -1,18 +1,51 @@
 
 import { songs } from "../../../assets/Songs.mjs";
 import { playerStore } from "../../../store/playerStore.mjs";
-
+import placeholderImage from "../../../assets/background.svg";
 export const ICONS = {
   PLAY: "M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z",
   PAUSE: "M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"
 };
 
 
+export const ImageUpdate = () => {
+  const { currentSongData, currentSongId, currentAudio } = playerStore.getState();
+  const songImage = document.getElementById('song-image');
+  const imageSource = document.getElementById('dynamic-image-source');
+  const songTitle = document.getElementById('song-title');
+  const songArtist = document.getElementById('song-artist');
+  
+ // Valores por defecto si no hay datos
+  if (!currentSongData || !currentSongId || !currentAudio) {
+    imageSource.srcset = placeholderImage.src; 
+    songImage.alt = 'Selecciona una canción';
+    songTitle.textContent = '';
+    songArtist.textContent = '';
+    return;
+  }
+
+  // Nuevos datos de la canción
+  const newImageUrl = currentSongData?.image?.src || '';
+  const prevImageUrl = imageSource.srcset;
+
+  // Precargar imagen para evitar flashes
+  const preloadImage = new Image();
+  preloadImage.src = newImageUrl;
+
+  // Actualizar solo si hay cambios
+  if (newImageUrl !== prevImageUrl) {
+    imageSource.srcset = newImageUrl;
+    songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
+  }
+
+  // Actualizar título y artista siempre (por si cambian sin cambiar la imagen)
+  songTitle.textContent = currentSongData.name || '';
+  songArtist.textContent = currentSongData.artist || '';
+};
 
 export const updateButtonUI = (button, isActive) => {
   const iconPath = button.querySelector("svg > path");
   if (!iconPath) return;
-  
   iconPath.setAttribute("d", isActive ? ICONS.PAUSE : ICONS.PLAY);
   button.setAttribute("aria-label", isActive ? "Pausar" : "Reproducir");
 
@@ -21,8 +54,7 @@ export const updateButtonUI = (button, isActive) => {
 export const handleSongChange = async (button, location) => {
   const songId = button.getAttribute("data-id");
   await playerStore.playSong(songId, location);
-
-  
+  console.log("a")
 };
 
 export const setupButtonListener = (button, location) => {
@@ -32,7 +64,6 @@ export const setupButtonListener = (button, location) => {
     if (now - lastClick < 500) return;
     lastClick = now;
     await handleSongChange(button, location);
-    
   });
 };
 
@@ -117,8 +148,6 @@ const setupButtons = () => {
     });
   };
   
-  
-
   // Eventos del reproductor
   const setupAudioEvents = async () => {
     if (!Audio) return;
@@ -137,31 +166,34 @@ const setupButtons = () => {
     let isDragging = false;
     const { volumen } = playerStore.getState();  
     const slider = document.getElementById('Container-Range');
-    const input = document.querySelector('input[type="range"]');
+    const input = document.getElementById("input-volumen")
     if (!slider || !input || !Audio) {
       console.error('Elementos esenciales no encontrados');
       return;
     }
     
     let initialVolume = volumen ;
-    initialVolume = Audio.volume;
+    VolumenIcon(initialVolume)
+    Audio.volume = initialVolume;
     input.value = initialVolume.toString();
 
-    let volumeControl = null
-    input.addEventListener('input', (e) => {
+    let volumeControl = null;
+    input.addEventListener('input', () => {
       const volume = parseFloat(input.value);
       Audio.volume = volume;
       Audio.muted = false;
-      
       // Actualización del estado y UI
       volumeControl = volume
 
       const progressElement = document.querySelector('.progress');
       progressElement.style.setProperty('--progress', `${volume * 100}%`);
       input.setAttribute("value", Audio.volume)
-      VolumenIcon(volume)
-      
+
+      if (volume <= 0.01 ) {
+        VolumenIcon(volume)
+      }
     });
+
     
   
       // Evento cuando se presiona el mouse (inicio del arrastre)
@@ -236,18 +268,163 @@ const setupButtons = () => {
     });
   }
 
-  const BarDuration = () => {
-     const { duration, currentAudio, isPlaying } = playerStore.getState();
-      const CurrentSongDuration = document.getElementById("Current-Song-Duration")
-      const SongDuration = document.getElementById("Song-Duration")
-      const BarSongDuration = document.getElementById("Bar-Song-Duration")
-      const sliderDuration = document.getElementById("Range-Duration")
-      const inputDuration = document.getElementById("Input-bar")
-      const progressDuration = document.querySelector(".progress-Duration")
 
-      console.log("a")
+const BarDuration = () => {
+  const { currentAudio, currentTime, duration, currentSongId} = playerStore.getState();
+  const CurrentSongDuration = document.getElementById("Current-Song-Duration");
+  const SongDuration = document.getElementById("Song-Duration");
+  const RangeDuration = document.getElementById("Range-Duration");
+  const InputBar = document.getElementById("Input-bar");
+  const ProgressDuration = document.querySelector(".progress-Duration");
+  
+
+  let shouldUpdateStore = true;
+  let isDragging = false;
+  let previewTime = 0;
 
 
+  // Función para formatear tiempo (mm:ss)
+  const formatTime = (seconds) => {
+    if (isNaN(seconds)) return "0:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  // Función para sincronizar el audio con el estado guardado
+  const syncAudioWithSavedState = () => {
+    // Sincronizar el tiempo actual
+    if (currentTime > 0 && currentAudio.currentTime !== currentTime) {
+      currentAudio.currentTime = currentTime;
+    }
+  }
+  // Actualizar UI basado directamente en el audio
+   const updateProgressUI = (time = null) => {
+    const effectiveTime = time !== null ? time : (currentAudio?.currentTime);
+    const effectiveDuration = currentAudio?.duration || duration || 0;
+    // Actualizar displays 
+    if (CurrentSongDuration) {
+      CurrentSongDuration.textContent = formatTime(effectiveTime);
+    }
+    if (SongDuration) {
+      SongDuration.textContent = formatTime(effectiveDuration);
+    }
+    // Actualizar barra de progreso
+    if (ProgressDuration) {
+      const progressPercent = (effectiveTime / effectiveDuration) * 100;
+      ProgressDuration.style.setProperty('--progress', `${progressPercent}%`);
+    }
+
+    // Actualizar input range
+    if (InputBar) {
+      InputBar.max = effectiveDuration;
+      InputBar.value = effectiveTime;
+    }
+  };
+
+  // Configurar eventos del audio
+  if (currentAudio) {
+    const onTimeUpdate = () => {
+      if (!isDragging && shouldUpdateStore) {
+        // Actualización UI (cada 900ms)
+        if (!currentAudio._lastUIUpdate || Date.now() - currentAudio._lastUIUpdate > 500) {
+          updateProgressUI();
+          currentAudio._lastUIUpdate = Date.now();
+        }
+        
+        // Actualización del store (cada 4000ms)
+        if (!currentAudio._lastStoreUpdate || Date.now() - currentAudio._lastStoreUpdate > 4000) {
+          playerStore.setState({ currentTime: currentAudio.currentTime });
+          currentAudio._lastStoreUpdate = Date.now();
+        }
+      }
+    }
+
+    
+    const onLoadedMetadata = () => {
+        updateProgressUI();
+        playerStore.setState({
+        duration: currentAudio.duration,
+      });
+    };
+
+    const onEnded = () => {
+      playerStore.setState({ isPlaying: false});
+
+    };
+
+    // Limpiar eventos anteriores si existen
+    currentAudio.removeEventListener('timeupdate', onTimeUpdate);
+    currentAudio.removeEventListener('loadedmetadata', onLoadedMetadata);
+    currentAudio.removeEventListener('ended', onEnded);
+
+    // Asignar nuevos eventos
+    currentAudio.addEventListener('timeupdate', onTimeUpdate);
+    currentAudio.addEventListener('loadedmetadata', onLoadedMetadata);
+    currentAudio.addEventListener('ended', onEnded);
+  }
+  // Interacción del usuario 
+  if (RangeDuration) {
+
+    const updateProgressOnDrag = (e) => {
+      const rect = RangeDuration.getBoundingClientRect();
+      const percent = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      const seekTime = percent * (currentAudio?.duration || 0);
+      
+      if (currentAudio) {
+        currentAudio.currentTime = seekTime;
+        shouldUpdateStore = true;
+      }
+    };
+
+    // Evento cuando se presiona el mouse 
+    RangeDuration.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      shouldUpdateStore = false;
+     const rect = RangeDuration.getBoundingClientRect();
+      const percent = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      previewTime = percent * (currentAudio?.duration || 0);
+      updateProgressUI(previewTime)
+    });
+
+    // Evento cuando se mueve el mouse 
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const rect = RangeDuration.getBoundingClientRect();
+      const percent = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+      previewTime = percent * (currentAudio?.duration || 0);
+      updateProgressUI(previewTime)
+    });
+
+    // Evento cuando se suelta el mouse 
+    document.addEventListener('mouseup', (e) => {
+      if (isDragging) {
+        isDragging = false;
+        updateProgressOnDrag(e);
+        
+        if (currentAudio) {
+          playerStore.setState({ currentTime: currentAudio.currentTime });
+        }
+      }
+    });
+
+
+    RangeDuration.addEventListener('mouseleave', (e) => {
+      if (isDragging) {
+        updateProgressUI()
+        shouldUpdateStore = true;
+        isDragging = false;
+        if (currentAudio) {
+          playerStore.setState({ currentTime: currentAudio.currentTime });
+        }
+      }
+      
+    });
+    // Click directo en la barra
+    RangeDuration.addEventListener('click', updateProgressOnDrag);
+  }
+
+  syncAudioWithSavedState();
 };
 
 
@@ -256,13 +433,16 @@ const setupButtons = () => {
       playerStore.setState({ 
         currentAudio: Audio,
       });
+      ImageUpdate()
       setupAudioEvents()
+      BarDuration()
       setupButtons();
       VolumenSet()
       console.log("Initialisz")
-      const { currentSongId, volumen, isPlaying, currentAudio} = playerStore.getState();
+
+      const { currentSongId, volumen, isPlaying, currentAudio, currentTime, duration} = playerStore.getState();
       // Restaurar estado
-  
+      console.log(playerStore.getState())
       try {
         if (currentSongId) {
           const song = songs.find(s => s.id === currentSongId);
@@ -270,8 +450,6 @@ const setupButtons = () => {
           
           const progressElement = document.querySelector('.progress');
           progressElement.style.setProperty('--progress', `${volumen * 100}%`);
-          
-
           // Solo actualiza el audio si es diferente al actual
           if (Audio.src !== song.Audio || Audio.dataset.id !== currentSongId) {
             Audio.src = song.Audio;
@@ -291,3 +469,4 @@ const setupButtons = () => {
     return () => unsubscribe();
   
 }
+

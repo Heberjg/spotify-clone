@@ -22,37 +22,41 @@ import placeholderImage from "../../../assets/background.svg";
 </div>
 
 <script>
-  import { playerStore } from "../../../store/playerStore.mjs";
-  import placeholderImage from "../../../assets/background.svg";
- 
-  const songImage = document.getElementById('song-image') as HTMLImageElement;
-  const imageSource = document.getElementById('dynamic-image-source') as HTMLImageElement;
-  const songTitle = document.getElementById('song-title');
-  const songArtist = document.getElementById('song-artist');
+  // import { playerStore } from "../../../store/playerStore.mjs";
+  // import placeholderImage from "../../../assets/background.svg";
+//  export const ImageUpdate = () => {
+//   const songImage = document.getElementById('song-image') as HTMLImageElement;
+//   const imageSource = document.getElementById('dynamic-image-source') as HTMLImageElement;
+//   const songTitle = document.getElementById('song-title');
+//   const songArtist = document.getElementById('song-artist');
 
-  const ImageUpdate = () => {
-  const { currentSongData, currentSongId } = playerStore.getState();
-  // Si no hay datos de canción o no hay ID de canción, establecer valores por defecto
-  if (!currentSongData || !currentSongId) {
-    // Establecer imagen por defecto (puedes usar una imagen placeholder o cadena vacía)
-    imageSource.srcset = placeholderImage.src; 
-    songImage.alt = 'Selecciona una canción';
   
-    return; // Salir de la función temprano
-  }
+//   const { currentSongData, currentSongId } = playerStore.getState();
+//   // Si no hay datos de canción o no hay ID de canción, establecer valores por defecto
+//   console.log(currentSongData)
+//   if (!currentSongData || !currentSongId) {
+//     // Establecer imagen por defecto (puedes usar una imagen placeholder o cadena vacía)
+//     imageSource.srcset = placeholderImage.src; 
+//     songImage.alt = 'Selecciona una canción';
+  
+//     return; // Salir de la función temprano
+//   }
 
-  if (currentSongData.image.src !==  imageSource.srcset) {
-    const newImageUrl = currentSongData?.image?.src || '';
-  imageSource.srcset = newImageUrl;
-  songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
+//   if (currentSongData.image.src !==  imageSource.srcset) {
+//       const newImageUrl = currentSongData?.image?.src || '';
+//     imageSource.srcset = newImageUrl;
+//     songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
+//     playerStore.setState({currentSongData: {
+//       image: newImageUrl
+//   }})
 
-  if (currentSongData) {
-    songTitle.textContent = currentSongData.name || '';
-    songArtist.textContent = currentSongData.artist || '';
-  }
-  }
-};
-  playerStore.subscribe(ImageUpdate)
+//     if (currentSongData) {
+//       songTitle.textContent = currentSongData.name || '';
+//       songArtist.textContent = currentSongData.artist || '';
+//     }
+//   }
+// };
+ 
 </script>
 
 
