@@ -16,14 +16,13 @@ export const ImageUpdate = () => {
   const songArtist = document.getElementById('song-artist');
   
  // Valores por defecto si no hay datos
-  if (!currentSongData || !currentSongId || !currentAudio) {
+  if (!currentSongData) {
     imageSource.srcset = placeholderImage.src; 
     songImage.alt = 'Selecciona una canción';
     songTitle.textContent = '';
     songArtist.textContent = '';
     return;
   }
-
   // Nuevos datos de la canción
   const newImageUrl = currentSongData?.image?.src || '';
   const prevImageUrl = imageSource.srcset;
@@ -36,11 +35,10 @@ export const ImageUpdate = () => {
   if (newImageUrl !== prevImageUrl) {
     imageSource.srcset = newImageUrl;
     songImage.alt = `Portada de ${currentSongData?.name || 'Canción'}`;
+    songTitle.textContent = currentSongData.name || '';
+    songArtist.textContent = currentSongData.artist || '';
   }
-
-  // Actualizar título y artista siempre (por si cambian sin cambiar la imagen)
-  songTitle.textContent = currentSongData.name || '';
-  songArtist.textContent = currentSongData.artist || '';
+  
 };
 
 export const updateButtonUI = (button, isActive) => {
@@ -54,7 +52,6 @@ export const updateButtonUI = (button, isActive) => {
 export const handleSongChange = async (button, location) => {
   const songId = button.getAttribute("data-id");
   await playerStore.playSong(songId, location);
-  console.log("a")
 };
 
 export const setupButtonListener = (button, location) => {
@@ -442,7 +439,6 @@ const BarDuration = () => {
 
       const { currentSongId, volumen, isPlaying, currentAudio, currentTime, duration} = playerStore.getState();
       // Restaurar estado
-      console.log(playerStore.getState())
       try {
         if (currentSongId) {
           const song = songs.find(s => s.id === currentSongId);
